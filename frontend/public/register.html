@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen transition-colors duration-300">
+    <div class="container max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Register</h1>
+        <div class="register-form">
+            <input type="text" id="username" placeholder="Username (optional)" class="w-full p-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <input type="email" id="email" placeholder="Email" class="w-full p-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <input type="password" id="password" placeholder="Password (min 8 characters)" class="w-full p-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <button id="register-btn" class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Register</button>
+            <p class="error text-red-500 mt-4" id="register-error"></p>
+            <p class="text-gray-700 dark:text-gray-300 mt-4">Already have an account? <a href="/login.html" class="text-blue-500 hover:underline">Login</a></p>
+            <button class="oauth-btn google w-full p-3 mt-4 bg-red-600 text-white rounded-lg hover:bg-red-700" onclick="window.location.href=`${window.ENV.API_URL}/auth/google`">Register with Google</button>
+            <button class="oauth-btn facebook w-full p-3 mt-4 bg-blue-800 text-white rounded-lg hover:bg-blue-900" onclick="window.location.href=`${window.ENV.API_URL}/auth/facebook`">Register with Facebook</button>
+            <button class="oauth-btn github w-full p-3 mt-4 bg-gray-800 text-white rounded-lg hover:bg-gray-900" onclick="window.location.href=`${window.ENV.API_URL}/auth/github`">Register with GitHub</button>
+        </div>
+    </div>
+    <script src="/assets/js/config.js"></script>
+    <script>
+        const API_URL = window.ENV.API_URL;
+
+document.getElementById('register-btn').addEventListener('click', async () => {
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorEl = document.getElementById('register-error');
+
+    if (!email) {
+        errorEl.textContent = 'Please enter an email address.';
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errorEl.textContent = 'Please enter a valid email address.';
+        return;
+    }
+    if (!password || password.length < 8) {
+        errorEl.textContent = 'Password must be at least 8 characters long.';
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password })
+        });
+        const data = await response.json();
+        if (data.token) {
+            localStorage.setItem('userToken', data.token);
+            window.location.href = '/';
+        } else {
+            errorEl.textContent = data.error || 'Registration failed. Please try again.';
+        }
+    } catch (error) {
+        errorEl.textContent = 'Registration failed: ' + error.message;
+    }
+});
+
+
+
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            if (token) {
+                localStorage.setItem('userToken', token);
+                window.location.href = '/';
+            } else if (localStorage.getItem('userToken')) {
+                // إذا كان هناك توكن بالفعل، أعد التوجيه إلى الصفحة الرئيسية
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+    "name": "cv-frontend",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "serve -s public",
+        "build": "echo 'No build step required'"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.5",
+        "serve": "^14.2.4",
+        "validator": "^13.15.15"
+    }
+}

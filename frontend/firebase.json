@@ -1,0 +1,37 @@
+{
+    "hosting": {
+        "public": "public",
+        "site": "mark-elasfar",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "rewrites": [
+            {
+                "source": "/admin",
+                "destination": "/admin/index.html"
+            },
+            {
+                "source": "/admin/comments",
+                "destination": "/admin/comments.html"
+            },
+            {
+                "source": "/login",
+                "destination": "/login.html"
+            },
+            {
+                "source": "/register",
+                "destination": "/register.html"
+            },
+            {
+                "source": "/auth/callback",
+                "destination": "/auth/callback.html"
+            },
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ]
+    }
+}

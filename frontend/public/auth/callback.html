@@ -1,0 +1,24 @@
+/home/mark/cv/frontend/public/auth/callback.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Callback</title>
+</head>
+<body>
+    <p>Authenticating...</p>
+    <script src="/assets/js/config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        if (token) {
+            localStorage.setItem('userToken', token);
+            window.location.href = '/';
+        } else {
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

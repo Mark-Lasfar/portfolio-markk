@@ -1,0 +1,1279 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ibrahim Al-Asfar</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="icon" href="/assets/img/mark.png">
+    <!-- Boxicons -->
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.6/css/flag-icons.min.css">
+    <style>
+        :root {
+            --first-color: #007bff;
+            --second-color: #333;
+            --primary-color: #fff;
+            --primary-color-2: #f4f4f4;
+            --container-border: #ccc;
+            --text-color: #333;
+            --background-color: #fff;
+        }
+        [data-theme="dark"] {
+            --first-color: #66b0ff;
+            --second-color: #ccc;
+            --primary-color: #1a1a1a;
+            --primary-color-2: #2c2c2c;
+            --container-border: #444;
+            --text-color: #fff;
+            --background-color: #121212;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .l-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: var(--primary-color);
+        }
+.home__data {
+  z-index: 10;
+  align-self: center;
+  position: relative;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+@media (min-width: 769px) {
+  .home__data {
+    margin-top: 110px;
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+}
+
+        .github-badges {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        .badge-item {
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+        }
+        .badge-item img {
+            width: 80px;
+            height: 80px;
+            transition: transform 0.5s ease, filter 0.3s ease;
+        }
+        .badge-item img:hover {
+            transform: rotateY(180deg);
+            filter: brightness(1.2);
+        }
+        .badge-description {
+            font-size: 0.9em;
+            margin-top: 5px;
+            color: var(--second-color);
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color-2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        .badge-item.show-description .badge-description {
+            display: block;
+        }
+        .stars ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            gap: 5px;
+        }
+        .star {
+            font-size: 1.5em;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .star.yellow {
+            color: #f1c40f;
+        }
+        .output {
+            background-color: var(--primary-color-2);
+            border: 1px solid var(--container-border);
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: var(--second-color);
+        }
+        .select-container {
+            margin-top: 10px;
+        }
+        .select-container select {
+            padding: 10px;
+            border-radius: 25px;
+            border: 2px solid var(--first-color);
+            background-color: var(--primary-color);
+            color: var(--second-color);
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 200px;
+        }
+        .select-container select:hover {
+            background-color: var(--first-color);
+            color: #fff;
+        }
+        .single-portfolio-content {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .single-portfolio-content:hover {
+            background-color: #f5f5f5;
+        }
+        #project-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--primary-color);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-height: 80vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .modal-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .modal-content h3 {
+            margin: 10px 0;
+            font-size: 1.5em;
+            color: var(--text-color);
+        }
+        .modal-content p {
+            margin: 10px 0;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+        .modal-stars {
+            margin: 10px 0;
+        }
+        .modal-stars ul, .stars-input {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .modal-stars li, .stars-input li {
+            font-size: 1.2em;
+            margin: 0 2px;
+            cursor: pointer;
+        }
+        .modal-stars .yellow, .stars-input .yellow {
+            color: #f1c40f;
+        }
+        .modal-stars .output {
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 200px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+        .modal-content select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            background: var(--primary-color-2);
+            color: var(--text-color);
+            border: 1px solid var(--container-border);
+            width: 100%;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            box-sizing: border-box;
+            max-height: 40px;
+        }
+        .modal-content select:focus {
+            outline: none;
+            border-color: var(--first-color);
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4d4d;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .close-btn:hover {
+            background: #e60000;
+        }
+        .user-rating {
+            margin: 15px 0;
+        }
+        .user-comment {
+            margin: 15px 0;
+        }
+        .user-comment textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--container-border);
+            resize: vertical;
+            font-size: 14px;
+            box-sizing: border-box;
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+        .submit-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: var(--first-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background: #0056b3;
+        }
+        .comments-section {
+            margin-top: 15px;
+            text-align: left;
+        }
+        .comment {
+            border-top: 1px solid var(--container-border);
+            padding: 10px 0;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        .reply {
+            margin-left: 20px;
+            font-size: 0.9em;
+            color: var(--text-color);
+            border-left: 2px solid var(--first-color);
+            padding-left: 10px;
+        }
+        .reply-btn, .submit-reply-btn {
+            background: #28a745;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .reply-btn:hover, .submit-reply-btn:hover {
+            background: #218838;
+        }
+        .reply-input {
+            display: none;
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--container-border);
+            resize: vertical;
+            font-size: 14px;
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+        .user-login {
+            margin: 15px 0;
+        }
+        .user-login a {
+            color: var(--first-color);
+            text-decoration: none;
+        }
+        .user-login a:hover {
+            text-decoration: underline;
+        }
+        body.modal-open {
+            overflow: hidden;
+        }
+        .error {
+            color: red;
+            text-align: center;
+        }
+
+        @media screen and (max-width: 768px) {
+  .home {
+    min-height: 100vh; /* خليها تملى الشاشة */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 2rem;  /* بدل 8rem أو 10rem */
+    padding-bottom: 2rem;
+  }
+
+  .home__data {
+    margin-top: 0; /* شيل أي Margin زايد */
+  }
+
+  .home__blob {
+    max-width: 250px; /* علشان الصورة متزقش المحتوى لتحت */
+    margin-top: 1rem;
+  }
+
+    #modeToggle {
+    width: 30px;
+    height: 30px;
+    margin-left: auto;
+    margin-right: 1rem;
+    display: block;
+    z-index: 9999;
+  }
+
+  .question-form {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--primary-color-2);
+  border-radius: 10px;
+  border: 1px solid var(--container-border);
+}
+.question-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--container-border);
+  resize: vertical;
+  font-size: 14px;
+  background: var(--primary-color);
+  color: var(--text-color);
+}
+.question-form button {
+  padding: 10px 20px;
+  background: var(--first-color);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.question-form button:hover {
+  background: #0056b3;
+}
+.question-form p {
+  margin-top: 10px;
+  color: var(--text-color);
+}
+  
+
+  .nav__menu {
+        position: fixed;
+        top: 60px;
+        right: -100%;
+        width: 80%;
+        height: 100%;
+        background-color: var(--primary-color);
+        transition: right 0.3s;
+        z-index: 1000;
+    }
+    .nav__menu.show {
+        right: 0;
+    }
+    .nav__list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    .nav__item {
+        margin: 10px 0;
+    }
+    .nav__link {
+        font-size: 1.2rem;
+        color: var(--text-color);
+    }
+    #theme-toggle {
+        display: block;
+        margin: 10px 0;
+    }
+    
+
+}
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .bounce {
+      animation: bounce 1s ease-in-out infinite;
+    }
+
+    /* Form Enhancements */
+#chat-form {
+    transition: all 0.3s ease;
+}
+
+.bg-token-bg-primary {
+    background-color: #2b2b2b;
+}
+
+.shadow-short {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.border-token-border-default {
+    border-color: #2b2929;
+}
+
+.text-token-text-primary {
+    color: var(--text-primary);
+}
+
+.text-token-text-secondary {
+    color: var(--text-secondary);
+}
+
+.bg-token-main-surface-secondary {
+    background-color: var(--main-surface-secondary);
+}
+
+#chat-history::-webkit-scrollbar, #question-input::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-history::-webkit-scrollbar-thumb, #question-input::-webkit-scrollbar-thumb {
+    background-color: var(--text-secondary);
+    border-radius: 10px;
+}
+
+#chat-history::-webkit-scrollbar-track, #question-input::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+#chat-form button:hover {
+    transform: scale(1.05);
+}
+
+#question-input {
+    transition: height 0.2s ease;
+}
+
+    </style>
+</head>
+<body id="by" onclick="playMusic()">
+    <!-- PushAlert -->
+    <script type="text/javascript">
+        (function(d, t) {
+            var g = d.createElement(t),
+                s = d.getElementsByTagName(t)[0];
+            g.src = "https://cdn.pushalert.co/integrate_cd79b7b18f143d860871ba2384ec33c0.js";
+            s.parentNode.insertBefore(g, s);
+        }(document, "script"));
+    </script>
+    <!-- End PushAlert -->
+
+    <header class="l-header">
+        <nav class="nav bd-grid">
+            <a href="#" class="nav__logo">Ibrahim
+                <audio autoplay loop id="music" src="assets/au/au.mp3"></audio>
+            </a>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item"><a href="#home" class="nav__link active">Home</a></li>
+                    <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
+                    <li class="nav__item"><a href="#skills" class="nav__link">Skills</a></li>
+                    <li class="nav__item"><a href="#work" class="nav__link">Work</a></li>
+                    <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
+                    <li class="nav__item"><a href="#footer" class="nav__link">Footer</a></li>
+                    <li class="nav__item"><a href="/admin" class="nav__link">Admin</a></li>
+                    <li class="nav__item"><a href="/login.html" class="nav__link" id="login-link">Login</a></li>
+                    <li class="nav__item"><a href="/register.html" class="nav__link" id="register-link">Register</a></li>
+                    <li class="nav__item"><a href="#" class="nav__link" id="logout-link" style="display: none;">Logout</a></li>
+                    <li>
+<a href="#" class="nav__link" id="theme-toggle">
+        <img id="modeToggle" class="icon color-icon"
+             src="assets/img/theme_light.png"
+             src-light="assets/img/theme_light.png"
+             src-dark="assets/img/theme_dark.png"
+             alt="Color theme icon" />
+    </a>
+                    </li>
+
+                </ul>
+
+                
+            </div>
+            <div class="nav__toggle" id="nav-toggle">
+                <i class='bx bx-menu'></i>
+            </div>
+        </nav>
+    </header>
+
+    <section class="home bd-grid" id="home">
+        <div class="home__data">
+            <h1 class="home__title">Hi, I'm <span class="home__title-color">Ibrahim</span></h1>
+            <h1 class="home__title">Full Stack  <br>  Web Developer</h1>
+            <h1 class="home__subtitle">& Founder of MGZon AI</h1>
+            <div class="home__img">
+                <svg class="home__blob" viewBox="0 0 479 467" xmlns="http://www.w3.org/2000/svg">
+                    <mask id="mask0" mask-type="alpha">
+                        <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z"/>
+                    </mask>
+                    <g mask="url(#mask0)">
+                        <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z"/>
+                        <image class="home__blob-img" x="50" y="60" href="assets/img/mark.png"/>
+                    </g>
+                </svg>
+            </div>
+            <div class="home__buttons">
+                <a href="tel:+201212444617" class="button">Contact</a>
+<a href="/assets/ibrahim.pdf" class="button" id="downloadCv" download>Download CV</a>
+                <a href="assets/app/mgzon.apk" class="button" download>Download MGZon App</a>
+
+
+            </div>
+        </div>
+        <div class="footer__icon">
+            <a href="https://www.linkedin.com/in/mark-elasfar-82b99a284/" class="home__social-icon"><i class='bx bxl-linkedin'></i></a>
+            <a href="https://www.behance.net/markelasfar" class="home__social-icon"><i class='bx bxl-behance'></i></a>
+            <a href="https://github.com/Mark-Lasfar/" class="home__social-icon"><i class='bx bxl-github'></i></a>
+            <a href="https://wa.me/+201212444617" class="home__social-icon"><i class='bx bxl-whatsapp'></i></a>
+        </div>
+
+        <!-- Logo Container -->
+<div class="mb-6 flex flex-col items-center cursor-pointer" id="logo-container">
+    <img src="/assets/img/markai.png" alt="Logo" class="w-32 h-32 object-cover rounded-full shadow-sm bounce">
+    <!-- <p class="mt-2 text-token-text-secondary text-sm font-medium">Ask Mark AI</p> -->
+</div>
+
+        <!-- Chat Form -->
+        <div id="chat-form" class="w-full max-w-2xl mx-auto hidden">
+            <form class="w-full">
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 flex flex-col space-y-3">
+                    <!-- Chat History -->
+                    <div id="chat-history" class="max-h-52 w-full overflow-y-auto space-y-3 px-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent">
+                        <!-- Chat messages will be appended here -->
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="relative flex w-full flex-col">
+                        <div class="relative w-full bg-gray-800 rounded-md">
+                            <textarea 
+                                id="question-input" 
+                                name="prompt-textarea" 
+                                class="w-full p-3 text-sm text-gray-100 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none max-h-[70px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent placeholder-gray-400" 
+                                placeholder="Ask anything..." 
+                                rows="2"
+                                data-virtualkeyboard="true"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <div class="flex w-full items-center justify-between gap-2 pt-2 border-t border-gray-700">
+                        <!-- Attach and Search Buttons (Left) -->
+                        <div class="flex items-center gap-2">
+                            <!-- Attach Button -->
+                    <div data-testid="composer-action-file-upload" style="view-transition-name:var(--vt-composer-attach-file-action)">
+                        <div class="relative">
+                            <span class="flex" data-state="closed">
+                                <div class="flex" type="button" id="radix-attach" aria-haspopup="menu" aria-expanded="false" data-state="closed">
+                                    <button 
+                                        aria-label="Add photos & files" 
+                                        class="flex items-center justify-center h-9 rounded-full border border-token-border-default text-token-text-secondary min-w-8 w-auto p-2 text-[13px] font-semibold radix-state-open:bg-black/10 hover:bg-token-main-surface-secondary dark:hover:bg-token-main-surface-secondary"
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon">
+                                            <path d="M4.33496 12.5V7.5C4.33496 7.13273 4.63273 6.83496 5 6.83496C5.36727 6.83496 5.66504 7.13273 5.66504 7.5V12.5C5.66504 14.8942 7.60585 16.835 10 16.835C12.3942 16.835 14.335 14.8942 14.335 12.5V5.83301C14.3348 4.35959 13.1404 3.16522 11.667 3.16504C10.1934 3.16504 8.99822 4.35948 8.99805 5.83301V12.5C8.99805 13.0532 9.44679 13.502 10 13.502C10.5532 13.502 11.002 13.0532 11.002 12.5V7.5C11.002 7.13273 11.2997 6.83496 11.667 6.83496C12.0341 6.83514 12.332 7.13284 12.332 7.5V12.5C12.332 13.7877 11.2877 14.832 10 14.832C8.71226 14.832 7.66797 13.7877 7.66797 12.5V5.83301C7.66814 3.62494 9.45888 1.83496 11.667 1.83496C13.875 1.83514 15.6649 3.62505 15.665 5.83301V12.5C15.665 15.6287 13.1287 18.165 10 18.165C6.87131 18.165 4.33496 15.6287 4.33496 12.5Z"></path>
+                                        </svg>
+                                        <span class="[display:var(--force-hide-label)] ps-1 pe-1 whitespace-nowrap" data-is-collapsable-label="">Attach</span>
+                                    </button>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                            <!-- Search Button -->
+                    <div data-testid="system-hint-search" style="view-transition-name:var(--vt-composer-search-action)">
+                        <span class="inline-block" data-state="closed">
+                            <div class="radix-state-open:bg-black/10 inline-flex h-9 rounded-full border text-[13px] font-medium text-token-text-secondary border-token-border-default hover:bg-token-main-surface-secondary dark:hover:bg-token-main-surface-secondary">
+                                <button 
+                                    class="flex h-full min-w-8 items-center justify-center p-2" 
+                                    data-testid="composer-button-search" 
+                                    aria-pressed="false" 
+                                    aria-label="Search"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon">
+                                        <path d="M10 2.125C14.3492 2.125 17.875 5.65076 17.875 10C17.875 14.3492 14.3492 17.875 10 17.875C5.65076 17.875 2.125 14.3492 2.125 10C2.125 5.65076 5.65076 2.125 10 2.125ZM7.88672 10.625C7.94334 12.3161 8.22547 13.8134 8.63965 14.9053C8.87263 15.5194 9.1351 15.9733 9.39453 16.2627C9.65437 16.5524 9.86039 16.625 10 16.625C10.1396 16.625 10.3456 16.5524 10.6055 16.2627C10.8649 15.9733 11.1274 15.5194 11.3604 14.9053C11.7745 13.8134 12.0567 12.3161 12.1133 10.625H7.88672ZM3.40527 10.625C3.65313 13.2734 5.45957 15.4667 7.89844 16.2822C7.7409 15.997 7.5977 15.6834 7.4707 15.3486C6.99415 14.0923 6.69362 12.439 6.63672 10.625H3.40527ZM13.3633 10.625C13.3064 12.439 13.0059 14.0923 12.5293 15.3486C12.4022 15.6836 12.2582 15.9969 12.1006 16.2822C14.5399 15.467 16.3468 13.2737 16.5947 10.625H13.3633ZM12.1006 3.7168C12.2584 4.00235 12.4021 4.31613 12.5293 4.65137C13.0059 5.90775 13.3064 7.56102 13.3633 9.375H16.5947C16.3468 6.72615 14.54 4.53199 12.1006 3.7168ZM10 3.375C9.86039 3.375 9.65437 3.44756 9.39453 3.7373C9.1351 4.02672 8.87263 4.48057 8.63965 5.09473C8.22547 6.18664 7.94334 7.68388 7.88672 9.375H12.1133C12.0567 7.68388 11.7745 6.18664 11.3604 5.09473C11.1274 4.48057 10.8649 4.02672 10.6055 3.7373C10.3456 3.44756 10.1396 3.375 10 3.375ZM7.89844 3.7168C5.45942 4.53222 3.65314 6.72647 3.40527 9.375H6.63672C6.69362 7.56102 6.99415 5.90775 7.4707 4.65137C7.59781 4.31629 7.74073 4.00224 7.89844 3.7168Z"></path>
+                                    </svg>
+                                    <span style="width:fit-content;opacity:1;transform:none">
+                                        <div class="[display:var(--force-hide-label)] ps-1 pe-1 font-semibold whitespace-nowrap">Search</div>
+                                    </span>
+                                </button>
+                            </div>
+                        </span>
+                    </div>
+                        </div>
+
+                        <!-- Submit Button (Right) -->
+                    <div data-testid="composer-action-submit" style="view-transition-name:var(--vt-composer-submit-action)">
+                        <button 
+                            id="submit-question" 
+                            class="flex items-center justify-center h-9 w-9 rounded-full bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                            aria-label="Send prompt"
+                            data-testid="send-button"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon">
+                                <path d="M8.99992 16V6.41407L5.70696 9.70704C5.31643 10.0976 4.68342 10.0976 4.29289 9.70704C3.90237 9.31652 3.90237 8.6835 4.29289 8.29298L9.29289 3.29298L9.36907 3.22462C9.76184 2.90427 10.3408 2.92686 10.707 3.29298L15.707 8.29298L15.7753 8.36915C16.0957 8.76192 16.0731 9.34092 15.707 9.70704C15.3408 10.0732 14.7618 10.0958 14.3691 9.7754L14.2929 9.70704L10.9999 6.41407V16C10.9999 16.5523 10.5522 17 9.99992 17C9.44764 17 8.99992 16.5523 8.99992 16Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    </div>
+                    <p class="error text-red-500 mt-2 text-center text-xs" id="question-error"></p>
+                </div>
+            </form>
+        </div>
+
+    </section>
+
+
+    <section class="about section" id="about">
+        <h2 class="section-title">About</h2>
+        <div class="about__container bd-grid">
+            <div class="about__img">
+                <img src="/assets/img/mac.png" alt="About Image">
+            </div>
+            <div>
+                <h2 class="about__subtitle">I'm Ibrahim Al-Asfar</h2>
+                <h3 class="about__subtitle">Education</h3>
+                <p class="about__text">Bachelor of Information Systems, Faculty of Computers and Information, Alexandria University, Egypt (2020–2024, Very Good)</p>
+                <h3 class="about__subtitle">Experience</h3>
+                <p class="about__text">
+                    - Founder & Lead Developer, MGZon AI (2023–Present): Built an AI-powered e-commerce platform similar to Amazon and Shopify, with integrations for payment, warehouse, dropshipping, and marketing.<br>
+                    - Freelance Developer (2020–2023): Developed e-commerce platforms and integrated APIs using multiple gateways, with a focus on scalability and Linux-based systems.<br>
+                    - Unpaid Internship, US Bank (Online, 2022): Gained experience in financial systems and API integrations.<br>
+                    - Over 5 years of programming experience, specializing in complex project planning and terminal-based workflows.
+                </p>
+                <h3 class="about__subtitle">Courses</h3>
+                <p class="about__text">Completed certifications from FreeCodeCamp (Web Development, JavaScript) and various online courses in Python, React, and TypeScript.</p>
+                <h3 class="about__subtitle">Motivation</h3>
+                <p class="about__text">If you want to set a goal, aim for the stars. Even if you miss, you'll land on the moon. Keep motivating yourself because you deserve to be the best.</p>
+                <h3 class="about__subtitle">GitHub Achievements</h3>
+                <div class="github-badges">
+                    <div class="badge-item" onclick="toggleDescription(this)">
+                        <img src="https://github.githubassets.com/images/modules/profile/achievements/pull-shark-default.png" alt="Pull Shark Badge">
+                        <div class="badge-description">Pull Shark: Significant contributions to open-source projects.</div>
+                    </div>
+                    <div class="badge-item" onclick="toggleDescription(this)">
+                        <img src="https://github.githubassets.com/images/modules/profile/achievements/yolo-default.png" alt="YOLO Badge">
+                        <div class="badge-description">YOLO: Pushed a commit without reviewing.</div>
+                    </div>
+                    <div class="badge-item" onclick="toggleDescription(this)">
+                        <img src="https://github.githubassets.com/assets/quickdraw-default-39c6aec8ff89.png" alt="Quickdraw Badge">
+                        <div class="badge-description">Quickdraw: Rapid contributions to repositories.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="skills section" id="skills">
+        <h2 class="section-title">Skills</h2>
+        <div class="skills__container bd-grid">
+            <div>
+                <h2 class="skills__subtitle">Professional Skills</h2>
+                <div id="skills-container"></div>
+            </div>
+            <div>
+                <img src="/assets/img/work3.jpg" alt="" class="skills__img">
+            </div>
+        </div>
+    </section>
+
+    <section class="work section" id="work">
+        <h2 class="section-title">Work</h2>
+        <div class="work__container bd-grid" id="projects-container">
+            <!-- Projects will be loaded dynamically -->
+        </div>
+        <div id="project-modal" style="display: none;">
+            <div class="modal-content">
+                <button class="close-btn">X</button>
+                <div class="user-login" id="user-login" style="display: none;">
+                    <p>Please <a href="/login.html">login</a> or <a href="/register.html">register</a> to comment.</p>
+                </div>
+                <img id="modal-image" src="" alt="Project Image" class="modal-img">
+                <h3 id="modal-title"></h3>
+                <p id="modal-description"></p>
+                <div class="modal-stars">
+                    <ul id="modal-stars-list"></ul>
+                    <div id="modal-rating"></div>
+                                    <div class="select-wrapper">
+                    <select id="modal-select" name="links" onchange="if(this.value) window.open(this.value, '_blank'); this.closest('#project-modal').style.display='none'; document.body.style.overflow='auto';">
+                        <option value="">Choose an option</option>
+                    </select>
+                </div>
+                </div>
+                <div class="select-wrapper">
+                    <select id="modal-select" name="links" onchange="if(this.value) window.open(this.value, '_blank'); this.closest('#project-modal').style.display='none'; document.body.style.overflow='auto';">
+                        <option value="">Choose an option</option>
+                    </select>
+                </div>
+                <div class="user-rating" id="user-rating" style="display: none;">
+                    <p>Rate this project:</p>
+                    <ul id="user-stars" class="stars-input">
+                        <li class="star" data-value="1">★</li>
+                        <li class="star" data-value="2">★</li>
+                        <li class="star" data-value="3">★</li>
+                        <li class="star" data-value="4">★</li>
+                        <li class="star" data-value="5">★</li>
+                    </ul>
+                </div>
+                <div class="user-comment" id="user-comment" style="display: none;">
+                    <textarea id="user-comment-input" placeholder="Leave a comment..." rows="4"></textarea>
+                    <button id="submit-comment" class="submit-btn">Submit</button>
+                    <p class="error" id="comment-error"></p>
+                </div>
+                <div id="comments-section" class="comments-section"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact section" id="contact">
+        <h2 class="section-title">Contact</h2>
+        <div class="contact__container bd-grid">
+            <form action="https://formspree.io/f/mwpebpvj" class="contact__form" method="POST" id="contactForm">
+                <input type="text" name="Name" placeholder="Name" class="contact__input" required>
+                <input type="email" name="Email" placeholder="Email" class="contact__input" required>
+                <textarea name="Message" cols="0" rows="10" class="contact__input" required></textarea>
+                <button type="submit" class="contact__button button">Send</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p class="footer__title">Ibrahim</p>
+        <h2 class="footer__copy">© Thank you for visiting my personal website</h2>
+        <div class="footer__social">
+            <a href="https://www.facebook.com/people/Mark-Al-Asfar/pfbid02GMisUQ8AqWkNZjoKtWFHH1tbdHuVscN1cjcFnZWy9HkRaAsmanBfT6mhySAyqpg4l/" class="footer__icon"><i class='bx bxl-facebook'></i></a>
+            <a href="https://www.instagram.com/explore/tags/mark/" class="footer__icon"><i class='bx bxl-instagram'></i></a>
+            <a href="https://x.com/marklasfar" class="footer__icon"><i class='bx bxl-twitter'></i></a>
+        </div>
+        <div class="containerDown">
+            <div class="last">
+                <div class="head">Total Website Visits</div>
+                <div class="count">1930537</div>
+            </div>
+        </div>
+        <p class="footer__copy">© Ibrahim Al-Asfar. All rights reserved</p>
+    </footer>
+
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/stars.js"></script>
+    <script src="/assets/js/config.js"></script>
+<script>
+const API_URL = window.ENV.API_URL;
+let userToken = localStorage.getItem('userToken');
+let currentProjectId = '';
+let conversationHistory = []; // لتخزين تاريخ المحادثة
+
+// إعداد Dark Mode/Light Mode
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    const modeToggle = document.getElementById('modeToggle');
+    if (modeToggle) {
+        modeToggle.src = theme === 'dark' ? modeToggle.getAttribute('src-dark') : modeToggle.getAttribute('src-light');
+    }
+}
+
+document.getElementById('theme-toggle')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    updateNav();
+    loadProjects();
+    loadSkills();
+});
+
+function updateNav() {
+    const loginLink = document.getElementById('login-link');
+    const registerLink = document.getElementById('register-link');
+    const logoutLink = document.getElementById('logout-link');
+    if (userToken) {
+        loginLink.style.display = 'none';
+        registerLink.style.display = 'none';
+        logoutLink.style.display = 'block';
+    } else {
+        loginLink.style.display = 'block';
+        registerLink.style.display = 'block';
+        logoutLink.style.display = 'none';
+    }
+}
+
+document.getElementById('logout-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('userToken');
+    userToken = null;
+    updateNav();
+    window.location.href = '/';
+});
+
+function playMusic() {
+    const music = document.getElementById('music');
+    if (music.paused) {
+        music.play().catch(error => console.error('Error playing audio:', error));
+    }
+}
+
+async function loadSkills() {
+    try {
+        const response = await fetch(`${API_URL}/api/skills`);
+        if (!response.ok) throw new Error('Failed to fetch skills');
+        const skills = await response.json();
+        const container = document.getElementById('skills-container');
+        container.innerHTML = '';
+        skills.forEach(skill => {
+            const div = document.createElement('div');
+            div.className = 'skills__data';
+            div.innerHTML = `
+                <div class="skills__names">
+                    <i class='${skill.icon} skills__icon'></i>
+                    <span class="skills__name">${skill.name}</span>
+                </div>
+                <div class="skills__bar skills__${skill.name.toLowerCase().replace(/[^a-z0-9]/g, '')}"></div>
+                <div><span class="skills__percentage">${skill.percentage}%</span></div>
+            `;
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Error loading skills:', error);
+    }
+}
+
+async function loadProjects() {
+    try {
+        const response = await fetch(`${API_URL}/api/projects`);
+        if (!response.ok) throw new Error('Failed to fetch projects');
+        const projects = await response.json();
+        const container = document.getElementById('projects-container');
+        container.innerHTML = '';
+        projects.forEach(project => {
+            const div = document.createElement('div');
+            div.className = 'single-portfolio-content';
+            div.setAttribute('data-id', project._id);
+            div.setAttribute('data-title', project.title);
+            div.setAttribute('data-description', project.description);
+            div.setAttribute('data-image', project.image);
+            div.setAttribute('data-rating', project.rating);
+            div.setAttribute('data-stars', project.stars);
+            div.innerHTML = `
+                <img src="${project.image}" alt="${project.title}" class="work__img">
+                <div class="work__content">
+                    <h3>${project.title}</h3>
+                    <p>${project.description}</p>
+                    <div class="stars">
+                        <ul>
+                            ${Array.from({ length: 5 }, (_, i) => `<li class="star ${i < project.stars ? 'yellow' : ''}" starValue="${i + 1}">★</li>`).join('')}
+                        </ul>
+                        <div class="output">${project.rating}</div>
+                    </div>
+                    <div class="select-container">
+                        <select name="links" onchange="if(this.value && !this.options[this.selectedIndex].dataset.isPrivate) window.open(this.value, '_blank'); else alert('This link is private for developers only');">
+                            <option value="">Choose an option</option>
+                            ${project.links.map(link => `<option value="${link.value}" data-is-private="${link.isPrivate}">${link.option}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Error loading projects:', error);
+    }
+}
+
+async function loadComments(projectId) {
+    try {
+        const response = await fetch(`${API_URL}/api/comments/${projectId}`, {
+            headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('userToken');
+            userToken = null;
+            updateNav();
+            document.getElementById('user-login').style.display = 'block';
+            document.getElementById('user-rating').style.display = 'none';
+            document.getElementById('user-comment').style.display = 'none';
+            document.getElementById('comment-error').textContent = 'Session expired. Please log in again.';
+            return;
+        }
+        if (!response.ok) throw new Error('Failed to fetch comments: ' + (await response.text()));
+        const comments = await response.json();
+        const commentsSection = document.getElementById('comments-section');
+        commentsSection.innerHTML = '';
+        comments.forEach(comment => {
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'comment';
+            commentDiv.innerHTML = `
+                <strong>${comment.userId?.username || 'Anonymous'}: ${'★'.repeat(comment.rating)}</strong>
+                <p>${comment.text}</p>
+                ${comment.replies.map(reply => `<div class="reply">Admin: ${reply.text} (${new Date(reply.timestamp).toLocaleString()})</div>`).join('')}
+                ${userToken ? `
+                    <button class="reply-btn" data-comment-id="${comment._id}">Reply</button>
+                    <textarea class="reply-input" data-comment-id="${comment._id}" placeholder="Write a reply..." style="display: none;"></textarea>
+                    <button class="submit-reply-btn" data-comment-id="${comment._id}" style="display: none;">Submit Reply</button>
+                ` : ''}
+            `;
+            commentsSection.appendChild(commentDiv);
+        });
+        document.getElementById('comment-error').textContent = '';
+    } catch (error) {
+        document.getElementById('comment-error').textContent = 'Failed to load comments: ' + error.message;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('project-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    const modalStarsList = document.getElementById('modal-stars-list');
+    const modalRating = document.getElementById('modal-rating');
+    const modalSelect = document.getElementById('modal-select');
+    const userStars = document.querySelectorAll('.stars-input li');
+    const commentInput = document.getElementById('user-comment-input');
+    const submitCommentBtn = document.getElementById('submit-comment');
+    const commentsSection = document.getElementById('comments-section');
+    const closeBtn = document.querySelector('.close-btn');
+    const userLogin = document.getElementById('user-login');
+    const userRating = document.getElementById('user-rating');
+    const userComment = document.getElementById('user-comment');
+    const commentError = document.getElementById('comment-error');
+    let selectedRating = 0;
+
+    document.getElementById('projects-container').addEventListener('click', function(e) {
+        const item = e.target.closest('.single-portfolio-content');
+        if (!item || e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION') return;
+
+        const id = item.getAttribute('data-id');
+        const title = item.getAttribute('data-title');
+        const description = item.getAttribute('data-description');
+        const image = item.getAttribute('data-image');
+        const rating = item.getAttribute('data-rating');
+        const stars = parseInt(item.getAttribute('data-stars'));
+        const selectOptions = item.querySelector('select').innerHTML;
+
+        modalImage.src = image;
+        modalImage.alt = title;
+        modalTitle.textContent = title;
+        modalDescription.textContent = description;
+        modalRating.textContent = rating;
+        modalSelect.innerHTML = selectOptions;
+        currentProjectId = id;
+
+        modalStarsList.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const li = document.createElement('li');
+            li.className = i <= stars ? 'star yellow' : 'star';
+            li.textContent = '★';
+            modalStarsList.appendChild(li);
+        }
+
+        selectedRating = 0;
+        userStars.forEach(star => star.classList.remove('yellow'));
+        userLogin.style.display = userToken ? 'none' : 'block';
+        userRating.style.display = userToken ? 'block' : 'none';
+        userComment.style.display = userToken ? 'block' : 'none';
+        commentError.textContent = '';
+
+        loadComments(id);
+
+        modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
+    });
+
+    userStars.forEach(star => {
+        star.addEventListener('click', function() {
+            selectedRating = parseInt(this.getAttribute('data-value'));
+            userStars.forEach(s => s.classList.remove('yellow'));
+            for (let i = 0; i < selectedRating; i++) {
+                userStars[i].classList.add('yellow');
+            }
+        });
+    });
+
+    submitCommentBtn.addEventListener('click', async function() {
+        if (!userToken) {
+            commentError.textContent = 'Please login or register to comment and rate.';
+            userLogin.style.display = 'block';
+            return;
+        }
+        const commentText = commentInput.value.trim();
+        if (commentText || selectedRating > 0) {
+            try {
+                const response = await fetch(`${API_URL}/api/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userToken}`
+                    },
+                    body: JSON.stringify({ projectId: currentProjectId, rating: selectedRating, text: commentText })
+                });
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('userToken');
+                        userToken = null;
+                        updateNav();
+                        userLogin.style.display = 'block';
+                        userRating.style.display = 'none';
+                        userComment.style.display = 'none';
+                        commentError.textContent = 'Session expired. Please log in again.';
+                        return;
+                    }
+                    throw new Error('Failed to submit comment');
+                }
+                commentInput.value = '';
+                selectedRating = 0;
+                userStars.forEach(star => star.classList.remove('yellow'));
+                loadComments(currentProjectId);
+                commentError.textContent = '';
+            } catch (error) {
+                commentError.textContent = 'Failed to submit comment: ' + error.message;
+            }
+        }
+    });
+
+    commentsSection.addEventListener('click', async function(e) {
+        if (!userToken) return;
+        if (e.target.classList.contains('reply-btn')) {
+            const commentId = e.target.getAttribute('data-comment-id');
+            const replyInput = commentsSection.querySelector(`.reply-input[data-comment-id="${commentId}"]`);
+            const submitReplyBtn = commentsSection.querySelector(`.submit-reply-btn[data-comment-id="${commentId}"]`);
+            replyInput.style.display = 'block';
+            submitReplyBtn.style.display = 'block';
+        } else if (e.target.classList.contains('submit-reply-btn')) {
+            const commentId = e.target.getAttribute('data-comment-id');
+            const replyInput = commentsSection.querySelector(`.reply-input[data-comment-id="${commentId}"]`);
+            const replyText = replyInput.value.trim();
+            if (replyText) {
+                try {
+                    const response = await fetch(`${API_URL}/api/comments/${commentId}/reply`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${userToken}`
+                        },
+                        body: JSON.stringify({ text: replyText })
+                    });
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            localStorage.removeItem('userToken');
+                            userToken = null;
+                            updateNav();
+                            userLogin.style.display = 'block';
+                            userRating.style.display = 'none';
+                            userComment.style.display = 'none';
+                            commentError.textContent = 'Session expired. Please log in again.';
+                            return;
+                        }
+                        throw new Error('Failed to submit reply');
+                    }
+                    replyInput.value = '';
+                    replyInput.style.display = 'none';
+                    e.target.style.display = 'none';
+                    loadComments(currentProjectId);
+                    commentError.textContent = '';
+                } catch (error) {
+                    commentError.textContent = 'Failed to submit reply: ' + error.message;
+                }
+            }
+        }
+    });
+
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    });
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    });
+
+    document.querySelector('.modal-content').addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+
+    function toggleDescription(element) {
+        const description = element.querySelector('.badge-description');
+        const isVisible = description.style.display === 'block';
+        document.querySelectorAll('.badge-description').forEach(desc => desc.style.display = 'none');
+        document.querySelectorAll('.badge-item').forEach(item => item.classList.remove('show-description'));
+        if (!isVisible) {
+            description.style.display = 'block';
+            element.classList.add('show-description');
+        }
+    }
+});
+
+// إظهار/إخفاء فورم المحادثة عند الضغط على اللوجو
+document.getElementById('logo-container').addEventListener('click', () => {
+    const chatForm = document.getElementById('chat-form');
+    chatForm.classList.toggle('hidden');
+});
+
+// ضبط ارتفاع textarea تلقائيًا
+document.getElementById('question-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 70) + 'px';
+});
+
+// التعامل مع إرسال الرسالة (Enter أو زر Submit)
+async function sendMessage() {
+    const questionInput = document.getElementById('question-input');
+    const question = questionInput.value.trim();
+    const errorEl = document.getElementById('question-error');
+    const chatHistory = document.getElementById('chat-history');
+    if (!question) {
+        errorEl.textContent = 'Please enter a question.';
+        return;
+    }
+    // إضافة رسالة المستخدم للتاريخ
+    conversationHistory.push({ role: 'user', content: question });
+    try {
+        errorEl.textContent = 'Loading...';
+        const response = await fetch(`${API_URL}/api/converse`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: conversationHistory })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            // إضافة رد النموذج للتاريخ
+            conversationHistory.push({ role: 'assistant', content: data.response });
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            messageDiv.innerHTML = `
+                <p><strong>You:</strong> ${question}</p>
+                <p><strong>Assistant:</strong> ${data.response}</p>
+            `;
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            errorEl.textContent = '';
+            questionInput.value = '';
+            questionInput.style.height = '40px';
+        } else {
+            errorEl.textContent = data.error || 'Failed to get an answer.';
+        }
+    } catch (error) {
+        errorEl.textContent = 'Failed to get an answer: ' + error.message;
+    }
+}
+
+document.getElementById('question-input').addEventListener('keydown', async function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        await sendMessage();
+    }
+});
+
+document.getElementById('submit-question').addEventListener('click', sendMessage);
+
+// التعامل مع زر Attach
+document.getElementById('radix-attach').addEventListener('click', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*,application/pdf';
+    fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const response = await fetch(`${API_URL}/api/upload`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${userToken}` },
+                body: formData
+            });
+            const data = await response.json();
+            if (response.ok) {
+                conversationHistory.push({ role: 'user', content: `Uploaded file: ${file.name}` });
+                conversationHistory.push({ role: 'assistant', content: data.message || 'File uploaded successfully.' });
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                messageDiv.innerHTML = `
+                    <p><strong>You:</strong> Uploaded file: ${file.name}</p>
+                    <p><strong>Assistant:</strong> ${data.message} <a href="${data.message.split(': ')[1]}" target="_blank">View File</a></p>
+                `;
+                document.getElementById('chat-history').appendChild(messageDiv);
+                document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollTop;
+                document.getElementById('question-error').textContent = '';
+            } else {
+                document.getElementById('question-error').textContent = data.error || 'Failed to upload file.';
+            }
+        } catch (error) {
+            document.getElementById('question-error').textContent = 'Failed to upload file: ' + error.message;
+        }
+    };
+    fileInput.click();
+});
+</script>
+</body>
+</html>
