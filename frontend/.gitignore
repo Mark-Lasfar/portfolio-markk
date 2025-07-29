@@ -68,3 +68,4 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+firebase-debug.log
