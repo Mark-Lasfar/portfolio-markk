@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+    <div class="container mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <h1 class="text-2xl font-bold text-center mb-6">Manage Users</h1>
+        <div class="flex justify-between mb-6">
+            <a href="/admin" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Back to Dashboard</a>
+            <a href="#" id="logout-btn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Logout</a>
+        </div>
+        <div class="users-list" id="users-list">
+            <h3>Users</h3>
+            <ul id="users-ul"></ul>
+            <p class="error" id="users-error"></p>
+        </div>
+    </div>
+    <script src="/assets/js/config.js"></script>
+    <script>
+        const API_URL = window.ENV.API_URL;
+let userToken = localStorage.getItem('userToken');
+
+        async function loadUsers() {
+            const errorEl = document.getElementById('users-error');
+            try {
+                const response = await fetch(`${API_URL}/api/users`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('userToken');
+                        window.location.href = '/admin';
+                        return;
+                    }
+                    throw new Error('Failed to fetch users');
+                }
+                const users = await response.json();
+                const ul = document.getElementById('users-ul');
+                ul.innerHTML = '';
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>${user.username || 'No Username'}</strong> (${user.email})
+                        <a href="/profile/${user.profile.nickname || user.username}" target="_blank">View Profile</a>
+                        <div>
+                            <button class="edit-btn" data-id="${user._id}">Edit</button>
+                            <button class="delete-btn" data-id="${user._id}">Delete</button>
+                        </div>
+                    `;
+                    ul.appendChild(li);
+                });
+                errorEl.textContent = '';
+            } catch (error) {
+                errorEl.textContent = 'Failed to load users: ' + error.message;
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('userToken');
+            window.location.href = '/admin';
+        });
+
+        document.getElementById('users-ul').addEventListener('click', async (e) => {
+            const errorEl = document.getElementById('users-error');
+            if (e.target.classList.contains('delete-btn')) {
+                const id = e.target.getAttribute('data-id');
+                try {
+                    const response = await fetch(`${API_URL}/api/users/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${userToken}` }
+                    });
+                    if (!response.ok) throw new Error('Failed to delete user');
+                    loadUsers();
+                    errorEl.textContent = '';
+                } catch (error) {
+                    errorEl.textContent = 'Failed to delete user: ' + error.message;
+                }
+            }
+        });
+
+        window.addEventListener('load', () => {
+            if (userToken) loadUsers();
+            else window.location.href = '/admin';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.6/css/flag-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        :root {
+            --first-color: #1d4ed8;
+            --second-color: #4b5563;
+            --primary-color: #fff;
+            --primary-color-2: #f3f4f6;
+            --container-border: #d1d5db;
+            --text-color: #1f2937;
+            --background-color: #f9fafb;
+            --border-color: #d1d5db;
+            --input-bg: #fff;
+        }
+        [data-theme="dark"] {
+            --first-color: #3b82f6;
+            --second-color: #9ca3af;
+            --primary-color: #1f2937;
+            --primary-color-2: #374151;
+            --container-border: #4b5563;
+            --text-color: #f3f4f6;
+            --background-color: #111827;
+            --border-color: #6b7280;
+            --input-bg: #374151;
+        }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+        }
+        .l-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav__logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .nav__logo img {
+            width: 1.75rem;
+            height: 1.75rem;
+            margin-right: 0.5rem;
+            object-fit: contain;
+        }
+        .nav__list {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .nav__link {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .nav__link:hover {
+            background-color: var(--first-color);
+            color: #fff;
+        }
+        #theme-toggle img {
+            width: 1.1rem;
+            height: 1.1rem;
+            vertical-align: middle;
+            transition: transform 0.3s;
+        }
+        #theme-toggle:hover img {
+            transform: rotate(15deg);
+        }
+        #search-input {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            width: 100%;
+            max-width: 150px;
+            font-size: 0.9rem;
+        }
+        #search-results {
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 150px;
+            z-index: 1000;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 32rem;
+            width: 95%;
+            margin: 5rem auto 2rem;
+            padding: 2rem;
+            background: var(--primary-color);
+            border: 1px solid var(--container-border);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        .home__data {
+            z-index: 10;
+            align-self: center;
+            position: relative;
+        }
+        .home__title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .home__title-color {
+            color: var(--first-color);
+        }
+        .home__subtitle {
+            font-size: 1rem;
+            color: var(--second-color);
+            margin-bottom: 1rem;
+        }
+        .home__img img {
+            width: 6rem;
+            height: 6rem;
+        }
+
+        .home__social {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.home__social-icon {
+    font-size: 1.5rem;
+    color: var(--first-color);
+    transition: color 0.3s;
+}
+.home__social-icon:hover {
+    color: #2563eb;
+}
+        .home__buttons .button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--first-color);
+            color: #fff;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        .home__buttons .button:hover {
+            background-color: #2563eb;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .about__subtitle {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .about__text {
+            font-size: 0.9rem;
+            color: var(--second-color);
+            margin-bottom: 0.5rem;
+        }
+        .skills__data {
+            margin-bottom: 1rem;
+        }
+        .skills__names {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .skills__bar {
+            height: 0.5rem;
+            background-color: var(--first-color);
+            border-radius: 0.25rem;
+            margin: 0.5rem 0;
+        }
+        .skills__percentage {
+            font-size: 0.9rem;
+            color: var(--second-color);
+        }
+        .work__img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .work__content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .work__content p {
+            font-size: 0.9rem;
+            color: var(--second-color);
+            margin-bottom: 1rem;
+        }
+        .select-container select {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 200px;
+        }
+        .select-container select:hover {
+            background-color: var(--first-color);
+            color: #fff;
+        }
+        .single-portfolio-content {
+            cursor: pointer;
+            transition: background-color 0.3s;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        .single-portfolio-content:hover {
+            background-color: var(--primary-color-2);
+        }
+        .comment {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .comment strong {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .comment p {
+            font-size: 0.9rem;
+            color: var(--second-color);
+            margin: 0.5rem 0;
+        }
+
+        .reply {
+            font-size: 0.85rem;
+            color: var(--second-color);
+            margin-left: 1rem;
+            margin-top: 0.5rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: var(--primary-color);
+            border-top: 1px solid var(--container-border);
+        }
+        .footer__copy {
+            font-size: 0.9rem;
+            color: var(--second-color);
+        }
+        .error {
+            color: #ef4444;
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        @media screen and (max-width: 768px) {
+            .nav__menu {
+                position: fixed;
+                top: 3rem;
+                right: -100%;
+                width: 70%;
+                max-width: 300px;
+                height: calc(100vh - 3rem);
+                background-color: var(--primary-color);
+                transition: right 0.3s ease;
+                z-index: 1000;
+                padding: 1rem;
+                box-shadow: -2px 0 6px rgba(0, 0, 0, 0.2);
+            }
+            .nav__menu.show {
+                right: 0;
+            }
+            .nav__list {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                padding: 0;
+            }
+            .nav__item {
+                width: 100%;
+            }
+            .nav__link {
+                display: block;
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
+            }
+            #theme-toggle img {
+                width: 1rem;
+                height: 1rem;
+            }
+            #search-input, #search-results {
+                max-width: 100%;
+            }
+            .container {
+                margin: 4rem auto 1rem;
+                padding: 1.5rem;
+            }
+            .home__data {
+                margin: 4rem 1rem 1rem;
+            }
+            .home__img img {
+                width: 6rem;
+                height: 6rem;
+            }
+            .nav__logo {
+                font-size: 1rem;
+            }
+            .nav__logo img {
+                width: 1.75rem;
+                height: 1.75rem;
+            }
+            .nav__toggle {
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: var(--text-color);
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .nav {
+                padding: 0.5rem;
+            }
+            .nav__logo {
+                font-size: 0.95rem;
+            }
+            .nav__logo img {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+            .container {
+                width: 98%;
+                padding: 1rem;
+            }
+        }
+        .home__blob {
+    width: 200px;
+    height: 200px;
+    fill: var(--svg-color, #000000);
+}
+.home__blob-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    clip-path: url(#mask0);
+}
+    </style>
+</head>
+<body>
+    <header class="l-header">
+        <nav class="nav bd-grid">
+            <a href="/" class="nav__logo"><img src="/assets/img/logo.svg" alt="Portfolio Logo"> <span id="portfolio-name">Portfolio</span></a>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <input type="text" id="search-input" placeholder="Search users..." class="p-2 rounded-lg border border-gray-300 dark:border-gray-600">
+                        <div id="search-results" class="hidden"></div>
+                    </li>
+                    <li class="nav__item"><a href="#home" class="nav__link active">Home</a></li>
+                    <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
+                    <li class="nav__item"><a href="#skills" class="nav__link">Skills</a></li>
+                    <li class="nav__item"><a href="#work" class="nav__link">Work</a></li>
+                    <li class="nav__item"><a href="#interactions" class="nav__link">Interactions</a></li>
+                    <li class="nav__item"><a href="/settings.html" class="nav__link">Settings</a></li>
+                    <li class="nav__item"><a href="/profile/me" class="nav__link" id="profile-link" style="display: none;">Profile</a></li>
+                    <li class="nav__item"><a href="/admin" class="nav__link" id="admin-link" style="display: none;">Admin</a></li>
+                    <li class="nav__item"><a href="/login.html" class="nav__link" id="login-link">Login</a></li>
+                    <li class="nav__item"><a href="/register.html" class="nav__link" id="register-link">Register</a></li>
+                    <li class="nav__item"><a href="#" class="nav__link" id="logout-link" style="display: none;">Logout</a></li>
+                    <li class="nav__item"><a href="#" class="nav__link" id="theme-toggle">
+                        <img id="modeToggle" class="icon color-icon"
+                             src="/assets/img/theme_light.png"
+                             src-light="/assets/img/theme_light.png"
+                             src-dark="/assets/img/theme_dark.png"
+                             alt="Color theme icon" />
+                    </a></li>
+                </ul>
+            </div>
+            <div class="nav__toggle" id="nav-toggle">
+                <i class='bx bx-menu'></i>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container" id="home">
+        <h1 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Profile</h1>
+        <div class="home__data">
+            <h1 class="home__title">Hi, I'm <span class="home__title-color" id="profile-nickname"></span></h1>
+            <h2 class="home__title" id="profile-jobTitle"></h2>
+            <p class="home__subtitle" id="profile-bio"></p>
+            <div class="home__img">
+<div class="home__img" id="avatar-container"></div>
+            </div>
+            <div class="home__buttons">
+                <a href="#" id="download-cv" class="button">Download CV</a>
+                <a href="#" id="contact-phone" class="button">Contact</a>
+            </div>
+            <div class="home__social">
+    <a href="#" id="social-linkedin" class="home__social-icon"><i class='bx bxl-linkedin'></i></a>
+    <a href="#" id="social-behance" class="home__social-icon"><i class='bx bxl-behance'></i></a>
+    <a href="#" id="social-github" class="home__social-icon"><i class='bx bxl-github'></i></a>
+    <a href="#" id="social-whatsapp" class="home__social-icon"><i class='bx bxl-whatsapp'></i></a>
+</div>
+        </div>
+    </div>
+
+    <div class="container" id="about">
+        <h2 class="section-title text-lg md:text-xl font-semibold mb-4 text-gray-900 dark:text-white">About</h2>
+        <div class="about__container">
+            <div>
+                <h3 class="about__subtitle text-base font-semibold text-gray-900 dark:text-white mb-2">Education</h3>
+                <div id="profile-education"></div>
+                <h3 class="about__subtitle text-base font-semibold text-gray-900 dark:text-white mb-2">Experience</h3>
+                <div id="profile-experience"></div>
+                <h3 class="about__subtitle text-base font-semibold text-gray-900 dark:text-white mb-2">Certificates</h3>
+                <div id="profile-certificates"></div>
+                <h3 class="about__subtitle text-base font-semibold text-gray-900 dark:text-white mb-2">Interests</h3>
+                <div id="profile-interests"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="skills">
+        <h2 class="section-title text-lg md:text-xl font-semibold mb-4 text-gray-900 dark:text-white">Skills</h2>
+        <div class="skills__container">
+            <div id="profile-skills"></div>
+        </div>
+    </div>
+
+    <div class="container" id="work">
+        <h2 class="section-title text-lg md:text-xl font-semibold mb-4 text-gray-900 dark:text-white">Work</h2>
+        <div class="work__container" id="profile-projects"></div>
+    </div>
+
+    <div class="container" id="interactions">
+        <h2 class="section-title text-lg md:text-xl font-semibold mb-4 text-gray-900 dark:text-white">Interactions</h2>
+        <div class="interactions__container" id="profile-interactions"></div>
+    </div>
+
+    <footer class="footer">
+        <p class="footer__copy">© <span id="footer-username"></span>. All rights reserved</p>
+    </footer>
+
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="/assets/js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        const API_URL = window.ENV.API_URL;
+        let userToken = localStorage.getItem('userToken');
+
+        async function updateNav() {
+            try {
+                const response = await fetch(`${API_URL}/api/verify-token`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('login-link').style.display = 'none';
+                    document.getElementById('register-link').style.display = 'none';
+                    document.getElementById('profile-link').style.display = 'block';
+                    document.getElementById('logout-link').style.display = 'block';
+                    if (data.isAdmin) {
+                        document.getElementById('admin-link').style.display = 'block';
+                    }
+                } else {
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('refreshToken');
+                    document.getElementById('login-link').style.display = 'block';
+                    document.getElementById('register-link').style.display = 'block';
+                    document.getElementById('profile-link').style.display = 'none';
+                    document.getElementById('logout-link').style.display = 'none';
+                    document.getElementById('admin-link').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error verifying token:', error);
+                Toastify({
+                    text: 'Error verifying token',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        }
+
+        async function loadProfile() {
+            const nickname = window.location.pathname.split('/').pop() || 'me';
+            if (userToken && !(await window.ENV.verifyToken(userToken))) {
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('refreshToken');
+                Toastify({
+                    text: 'Please login to view your profile',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+                window.location.href = '/login.html?reason=Please login to view your profile';
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/api/profile/${nickname}`, {
+                    headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status === 403 && errorData.loginRequired) {
+                        document.getElementById('profile-nickname').innerHTML = `
+                            <p class="text-gray-700 dark:text-gray-300 mt-4">
+                                This profile is private. <a href="/login.html" class="text-blue-500 hover:underline">Login</a> to view.
+                            </p>
+                        `;
+                        return;
+                    }
+                    throw new Error(errorData.error || 'Failed to fetch profile');
+                }
+                const data = await response.json();
+                document.getElementById('portfolio-name').textContent = data.profile.portfolioName || 'Portfolio';
+                document.getElementById('profile-nickname').textContent = data.profile.nickname || data.username;
+                document.getElementById('profile-jobTitle').textContent = data.profile.jobTitle || 'Not specified';
+                document.getElementById('profile-bio').textContent = data.profile.bio || 'Not specified';
+                document.getElementById('profile-avatar').src = data.profile.avatar || '/assets/img/default-avatar.png';
+                document.getElementById('contact-phone').href = `tel:${data.profile.phone || ''}`;
+document.getElementById('social-linkedin').href = data.profile.socialLinks?.linkedin || '#';
+document.getElementById('social-behance').href = data.profile.socialLinks?.behance || '#';
+document.getElementById('social-github').href = data.profile.socialLinks?.github || '#';
+document.getElementById('social-whatsapp').href = data.profile.socialLinks?.whatsapp || '#';
+                document.getElementById('footer-username').textContent = data.profile.nickname || data.username;
+                if (!userToken) {
+                    document.getElementById('profile-nickname').innerHTML += `
+                        <p class="text-gray-700 dark:text-gray-300 mt-4">
+                            <a href="/login.html" class="text-blue-500 hover:underline">Login</a> to access more features.
+                        </p>
+                    `;
+                }
+
+                const educationContainer = document.getElementById('profile-education');
+                educationContainer.innerHTML = data.profile.education.length ? data.profile.education.map(edu => `
+                    <p class="about__text">${edu.degree} at ${edu.institution} (${edu.year})</p>
+                `).join('') : '<p class="about__text">No education details provided.</p>';
+
+                const avatarContainer = document.getElementById('avatar-container');
+const avatarUrl = data.profile.avatar || '/assets/img/default-avatar.png';
+const avatarDisplayType = data.profile.avatarDisplayType || 'normal';
+const svgColor = data.profile.svgColor || '#000000';
+if (avatarDisplayType === 'svg') {
+    avatarContainer.innerHTML = `
+        <svg class="home__blob" viewBox="0 0 479 467" xmlns="http://www.w3.org/2000/svg">
+            <mask id="mask0" mask-type="alpha">
+                <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z"/>
+            </mask>
+            <g mask="url(#mask0)">
+                <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z" fill="${svgColor}"/>
+                <image class="home__blob-img" x="50" y="60" id="profile-avatar" href="${avatarUrl}" alt="Profile Image"/>
+            </g>
+        </svg>
+    `;
+} else {
+    avatarContainer.innerHTML = `
+        <img id="profile-avatar" src="${avatarUrl}" alt="Profile Image" class="w-24 h-24 object-cover rounded-full">
+    `;
+}
+
+                const experienceContainer = document.getElementById('profile-experience');
+                experienceContainer.innerHTML = data.profile.experience.length ? data.profile.experience.map(exp => `
+                    <p class="about__text">${exp.role} at ${exp.company} (${exp.duration})</p>
+                `).join('') : '<p class="about__text">No experience details provided.</p>';
+
+                const certificatesContainer = document.getElementById('profile-certificates');
+                certificatesContainer.innerHTML = data.profile.certificates.length ? data.profile.certificates.map(cert => `
+                    <p class="about__text">${cert.name} by ${cert.issuer} (${cert.year})</p>
+                `).join('') : '<p class="about__text">No certificates provided.</p>';
+
+                const interestsContainer = document.getElementById('profile-interests');
+                interestsContainer.innerHTML = data.profile.interests.length ? data.profile.interests.map(interest => `
+                    <p class="about__text">${interest}</p>
+                `).join('') : '<p class="about__text">No interests provided.</p>';
+
+                const skillsContainer = document.getElementById('profile-skills');
+                skillsContainer.innerHTML = data.profile.skills.length ? data.profile.skills.map(skill => `
+                    <div class="skills__data">
+                        <div class="skills__names">
+                            <span class="skills__name">${skill.name}</span>
+                        </div>
+                        <div class="skills__bar" style="width: ${skill.percentage}%"></div>
+                        <div><span class="skills__percentage">${skill.percentage}%</span></div>
+                    </div>
+                `).join('') : '<p>No skills provided.</p>';
+
+                const projectsContainer = document.getElementById('profile-projects');
+                projectsContainer.innerHTML = data.profile.projects.length ? data.profile.projects.map(project => `
+                    <div class="single-portfolio-content">
+                        <img src="${project.image}" alt="${project.title}" class="work__img">
+                        <div class="work__content">
+                            <h3>${project.title}</h3>
+                            <p>${project.description}</p>
+                            <div class="select-container">
+                                <select name="links" onchange="if(this.value) window.open(this.value, '_blank');">
+                                    <option value="">Choose an option</option>
+                                    ${project.links.map(link => `<option value="${link.value}">${link.option}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `).join('') : '<p>No projects provided.</p>';
+
+                document.getElementById('download-cv').href = `${API_URL}/api/profile/pdf/${nickname}`;
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                Toastify({
+                    text: `Error loading profile: ${error.message}`,
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        }
+
+        async function loadInteractions() {
+            if (!userToken) return;
+            try {
+                const response = await fetch(`${API_URL}/api/user-interactions`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                if (!response.ok) throw new Error('Failed to fetch interactions');
+                const comments = await response.json();
+                const interactionsContainer = document.getElementById('profile-interactions');
+                interactionsContainer.innerHTML = comments.length ? comments.map(comment => `
+                    <div class="comment">
+                        <strong>Project: ${comment.projectId?.title || 'Unknown'}</strong>
+                        <p>Rating: ${'★'.repeat(comment.rating)}</p>
+                        <p>Comment: ${comment.text}</p>
+                        ${comment.replies.map(reply => `<div class="reply">Admin: ${reply.text} (${new Date(reply.timestamp).toLocaleString()})</div>`).join('')}
+                    </div>
+                `).join('') : '<p>No interactions yet.</p>';
+            } catch (error) {
+                console.error('Error loading interactions:', error);
+                Toastify({
+                    text: `Error loading interactions: ${error.message}`,
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        }
+
+        async function loadSearchResults(query) {
+            try {
+                const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
+                    headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch search results');
+                }
+                const users = await response.json();
+                const searchResults = document.getElementById('search-results');
+                searchResults.classList.remove('hidden');
+                searchResults.innerHTML = users.length ? users.map(user => `
+                    <a href="${user.profileUrl}" class="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <img src="${user.avatar || '/assets/img/default-avatar.png'}" alt="${user.nickname || user.username}" class="inline-block w-8 h-8 rounded-full mr-2">
+                        ${user.nickname || user.username}
+                    </a>
+                `).join('') : '<p class="p-2">No users found.</p>';
+            } catch (error) {
+                console.error('Error searching users:', error);
+                Toastify({
+                    text: `Error searching users: ${error.message}`,
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 2) {
+                loadSearchResults(query);
+            } else {
+                document.getElementById('search-results').classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const searchResults = document.getElementById('search-results');
+            if (searchResults && !e.target.closest('#search-input') && !e.target.closest('#search-results')) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('logout-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch(`${API_URL}/api/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') })
+                });
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('refreshToken');
+                userToken = null;
+                updateNav();
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout failed:', error);
+                Toastify({
+                    text: 'Error during logout',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            const modeToggle = document.getElementById('modeToggle');
+            modeToggle.src = newTheme === 'light' ? modeToggle.getAttribute('src-light') : modeToggle.getAttribute('src-dark');
+            document.body.classList.toggle('theme-transition');
+            setTimeout(() => document.body.classList.remove('theme-transition'), 300);
+        });
+
+        document.getElementById('nav-toggle').addEventListener('click', () => {
+            document.getElementById('nav-menu').classList.toggle('show');
+        });
+
+        document.querySelectorAll('.nav__link').forEach(link => {
+            link.addEventListener('click', () => {
+                const navMenu = document.getElementById('nav-menu');
+                navMenu.classList.remove('show');
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const modeToggle = document.getElementById('modeToggle');
+            modeToggle.src = savedTheme === 'light' ? modeToggle.getAttribute('src-light') : modeToggle.getAttribute('src-dark');
+            updateNav();
+            loadProfile();
+            loadInteractions();
+        });
+    </script>
+</body>
+</html>

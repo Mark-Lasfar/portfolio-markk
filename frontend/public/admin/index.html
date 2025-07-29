@@ -14,25 +14,28 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.6/css/flag-icons.min.css">
     <title>Admin Dashboard</title>
     <style>
-        :root {
-            --first-color: #007bff;
-            --second-color: #333;
-            --primary-color: #fff;
-            --primary-color-2: #f4f4f4;
-            --container-border: #ccc;
-            --text-color: #333;
-            --background-color: #fff;
-        }
-
-        [data-theme="dark"] {
-            --first-color: #66b0ff;
-            --second-color: #ccc;
-            --primary-color: #1a1a1a;
-            --primary-color-2: #2c2c2c;
-            --container-border: #444;
-            --text-color: #fff;
-            --background-color: #121212;
-        }
+:root {
+    --first-color: #007bff;
+    --second-color: #333;
+    --primary-color: #fff;
+    --primary-color-2: #f4f4f4;
+    --container-border: #ccc;
+    --text-color: #333;
+    --background-color: #fff;
+    --border-color: #ccc;
+    --input-bg: #fff;
+}
+[data-theme="dark"] {
+    --first-color: #66b0ff;
+    --second-color: #ccc;
+    --primary-color: #1a1a1a;
+    --primary-color-2: #2c2c2c;
+    --container-border: #444;
+    --text-color: #fff;
+    --background-color: #121212;
+    --border-color: #666;
+    --input-bg: #2c2c2c;
+}
 
         body {
             font-family: Arial, sans-serif;
@@ -238,10 +241,10 @@
             <p class="error" id="skill-error"></p>
         </div>
         <hr>
-        <div class="projects-list" id="projects-list" style="display: none;">
-            <h3>Projects</h3>
-            <ul id="projects-ul"></ul>
-        </div>
+<div class="projects-list" id="projects-list" style="display: none;">
+    <h3>Main Page Projects</h3>
+    <ul id="projects-ul"></ul>
+</div>
         <hr>
         <div class="skills-list" id="skills-list" style="display: none;">
             <h3>Skills</h3>
@@ -260,7 +263,7 @@
     <script src="/assets/js/config.js"></script>
     <script>
         const API_URL = window.ENV.API_URL;
-        let adminToken = localStorage.getItem('adminToken');
+let userToken = localStorage.getItem('userToken');
 
         // إعداد Dark Mode/Light Mode
         function setTheme(theme) {
@@ -280,13 +283,13 @@
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             setTheme(savedTheme);
-            if (adminToken) {
+            if (userToken) {
                 document.getElementById('admin-login').style.display = 'none';
                 document.getElementById('project-form').style.display = 'block';
                 document.getElementById('projects-list').style.display = 'block';
                 document.getElementById('skills-form').style.display = 'block';
                 document.getElementById('skills-list').style.display = 'block';
-                document.getElementById('conversations-list').style.display = 'block';
+document.getElementById('notifications-list').style.display = 'block'; // تصحيح هنا
                 loadProjects();
                 loadSkills();
                 loadConversations();
@@ -305,14 +308,14 @@
                 });
                 const data = await response.json();
                 if (data.token) {
-                    adminToken = data.token;
-                    localStorage.setItem('adminToken', adminToken);
+                    userToken = data.token;
+                    localStorage.setItem('userToken', userToken);
                     document.getElementById('admin-login').style.display = 'none';
                     document.getElementById('project-form').style.display = 'block';
                     document.getElementById('projects-list').style.display = 'block';
                     document.getElementById('skills-form').style.display = 'block';
                     document.getElementById('skills-list').style.display = 'block';
-                    document.getElementById('conversations-list').style.display = 'block';
+document.getElementById('notifications-list').style.display = 'block'; // تصحيح هنا
                     errorEl.textContent = '';
                     loadProjects();
                     loadSkills();
@@ -325,11 +328,46 @@
             }
         }
 
+        async function loadNotifications() {
+    const errorEl = document.createElement('p');
+    errorEl.className = 'error';
+    document.getElementById('notifications-list').prepend(errorEl);
+    try {
+        const response = await fetch(`${API_URL}/api/notifications`, {
+            headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        if (response.status === 401 || response.status === 403) {
+            errorEl.textContent = 'Session expired. Please log in again.';
+            document.getElementById('admin-login').style.display = 'block';
+            document.getElementById('project-form').style.display = 'none';
+            document.getElementById('projects-list').style.display = 'none';
+            document.getElementById('skills-form').style.display = 'none';
+            document.getElementById('skills-list').style.display = 'none';
+            document.getElementById('notifications-list').style.display = 'none';
+            localStorage.removeItem('userToken');
+            userToken = null;
+            return;
+        }
+        if (!response.ok) throw new Error('Failed to fetch notifications');
+        const notifications = await response.json();
+        const ul = document.getElementById('notifications-ul');
+        ul.innerHTML = '';
+        notifications.forEach((notification, index) => {
+            const li = document.createElement('li');
+            li.textContent = `Notification ${index + 1}: ${notification}`;
+            ul.appendChild(li);
+        });
+        errorEl.textContent = '';
+    } catch (error) {
+        errorEl.textContent = 'Failed to load notifications: ' + error.message;
+    }
+}
+
         async function loadSkills() {
             const errorEl = document.getElementById('skill-error');
             try {
                 const response = await fetch(`${API_URL}/api/skills`, {
-                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                    headers: { 'Authorization': `Bearer ${userToken}` }
                 });
                 if (!response.ok) throw new Error('Failed to fetch skills');
                 const skills = await response.json();
@@ -366,7 +404,7 @@
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${adminToken}`
+                        'Authorization': `Bearer ${userToken}`
                     },
                     body: JSON.stringify({ name, percentage, icon })
                 });
@@ -388,7 +426,7 @@
                 if (e.target.classList.contains('edit-btn')) {
                     const id = e.target.getAttribute('data-id');
                     const response = await fetch(`${API_URL}/api/skills`, {
-                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                        headers: { 'Authorization': `Bearer ${userToken}` }
                     });
                     if (!response.ok) throw new Error('Failed to fetch skill');
                     const skills = await response.json();
@@ -402,7 +440,7 @@
                     const id = e.target.getAttribute('data-id');
                     const response = await fetch(`${API_URL}/api/skills/${id}`, {
                         method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                        headers: { 'Authorization': `Bearer ${userToken}` }
                     });
                     if (!response.ok) throw new Error('Failed to delete skill');
                     errorEl.textContent = '';
@@ -417,7 +455,7 @@
             const errorEl = document.getElementById('project-error');
             try {
                 const response = await fetch(`${API_URL}/api/projects`, {
-                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                    headers: { 'Authorization': `Bearer ${userToken}` }
                 });
                 if (!response.ok) throw new Error('Failed to fetch projects');
                 const projects = await response.json();
@@ -446,7 +484,7 @@
             document.getElementById('conversations-list').prepend(errorEl);
             try {
                 const response = await fetch(`${API_URL}/api/conversations/export`, {
-                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                    headers: { 'Authorization': `Bearer ${userToken}` }
                 });
                 if (response.status === 401 || response.status === 403) {
                     errorEl.textContent = 'Session expired. Please log in again.';
@@ -456,8 +494,8 @@
                     document.getElementById('skills-form').style.display = 'none';
                     document.getElementById('skills-list').style.display = 'none';
                     document.getElementById('conversations-list').style.display = 'none';
-                    localStorage.removeItem('adminToken');
-                    adminToken = null;
+                    localStorage.removeItem('userToken');
+                    userToken = null;
                     return;
                 }
                 if (!response.ok) throw new Error('Failed to fetch conversations');
@@ -515,7 +553,7 @@
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${adminToken}`
+                        'Authorization': `Bearer ${userToken}`
                     },
                     body: JSON.stringify({ title, description, image, rating, stars, links })
                 });
@@ -527,8 +565,8 @@
                     document.getElementById('skills-form').style.display = 'none';
                     document.getElementById('skills-list').style.display = 'none';
                     document.getElementById('conversations-list').style.display = 'none';
-                    localStorage.removeItem('adminToken');
-                    adminToken = null;
+                    localStorage.removeItem('userToken');
+                    userToken = null;
                     return;
                 }
                 if (!response.ok) throw new Error('Failed to save project');
@@ -552,7 +590,7 @@
                 if (e.target.classList.contains('edit-btn')) {
                     const id = e.target.getAttribute('data-id');
                     const response = await fetch(`${API_URL}/api/projects`, {
-                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                        headers: { 'Authorization': `Bearer ${userToken}` }
                     });
                     if (!response.ok) throw new Error('Failed to fetch project');
                     const projects = await response.json();
@@ -576,7 +614,7 @@
                     const id = e.target.getAttribute('data-id');
                     const response = await fetch(`${API_URL}/api/projects/${id}`, {
                         method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                        headers: { 'Authorization': `Bearer ${userToken}` }
                     });
                     if (!response.ok) throw new Error('Failed to delete project');
                     errorEl.textContent = '';
@@ -589,8 +627,8 @@
 
         document.getElementById('logout-btn').addEventListener('click', (e) => {
             e.preventDefault();
-            localStorage.removeItem('adminToken');
-            adminToken = null;
+            localStorage.removeItem('userToken');
+            userToken = null;
             window.location.href = '/admin';
         });
     </script>

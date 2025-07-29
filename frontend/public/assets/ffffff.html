@@ -1,5 +1,231 @@
-                            <div class="select-wrapper">
-                    <select id="modal-select" name="links" onchange="if(this.value) window.open(this.value, '_blank'); this.closest('#project-modal').style.display='none'; document.body.style.overflow='auto';">
-                        <option value="">Choose an option</option>
-                    </select>
+احسنت يا رايق ولكن 
+
+انا عايز 
+<!-- Logo Container -->
+عايز الشعار من غير دايره مش عايز حاجه حواله خالص عايزه حر هو كمان بيتنطط كويس جدا لكن موجود بداخل دائره مبوظه شكله كمان عايز لم يكون بيتنطط يكون في خيال زي ظل خفيف 
+
+
+كمان الفورم
+            <!-- Input Area -->
+
+ مش مرن تلقائي ياعني لو المستخدم حب يبعت رساله مثلا كبيره الفورم مش بيكبر معاه فاهم سابت وده مش مطلوب لان المستخدم مش هيحب كده طبعا عايزه يكون مرن معاه في حدود  7 سانتي 
+
+
+كمان ال 
+
+            <!-- Input Area -->
+مش واخده background  رمادي 
+
++
+مش بيكبر بشكل تلقائي ومش مرن مع الرساله اللي المستخدم بيكتبها 
+
+كمان المستخدم لو بيكتب رساله ال 
+                <!-- Footer Actions -->
+                    <!-- Attach Button -->
+                    <!-- Search Button -->
+                    <!-- Submit Button -->
+
+
+بتكون داخل ال 
+
+            <!-- Input Area -->
+
+هذا صحيح ولكن الكلام بيكون ظاهر علي الايكونات مفيش فيصل خفي بين الايكونات والانبوت بتاع الادخال 
+وده بياثر علي تحسين تجربه المستخدم وكمان مش بيعرف يشوف كويس 
+المفرود انهم تحت الانبوت بتاع الارسال 
+
+كمان المفرود بارده المستخدم لو داس علي انتر الرساله تتبعت لتحسين تجربه المستخدم 
+
+كمان ال 
+
+    <!-- Attach Button -->
+                    <!-- Search Button -->
+                    <!-- Submit Button -->
+
+المفرود ان 
+                    <!-- Submit Button -->
+
+تكون في مكانها اللي هو اليمين الشمال حسب ما ظاهر عندك يمين ولا شمال ههههه
+
+اما  ال 
+    <!-- Attach Button -->
+                    <!-- Search Button -->
+
+ف المفرود في الناحيه العكسي لل 
+                    <!-- Submit Button -->
+
+
+
+
+
+
+<!-- Logo Container -->
+<div class="mb-6 flex flex-col items-center cursor-pointer" id="logo-container">
+    <img src="/assets/img/markai.png" alt="Logo" class="w-32 h-32 object-cover rounded-full shadow-sm bounce">
+    <p class="mt-2 text-token-text-secondary text-sm font-medium">Ask Mark AI</p>
+</div>
+
+<!-- Chat Form -->
+<div id="chat-form" class="w-full max-w-[--thread-content-max-width] mx-auto hidden">
+    <form class="w-full [view-transition-name:var(--vt-composer)]">
+        <div class="bg-token-bg-primary shadow-short flex w-full cursor-text flex-col items-center justify-center overflow-clip bg-clip-padding contain-inline-size dark:bg-[#303030] rounded-[28px]">
+            <!-- Chat History -->
+            <div id="chat-history" class="max-h-52 w-full overflow-y-auto mb-3 space-y-3 px-3 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                <!-- Chat messages will be appended here -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="relative flex min-h-14 w-full items-end">
+                <div class="relative flex w-full flex-auto flex-col">
+                    <div class="relative mx-2 flex min-h-12 flex-auto bg-transparent items-start">
+                        <textarea 
+                            id="question-input" 
+                            name="prompt-textarea" 
+                            class="w-full p-2.5 text-sm text-token-text-primary dark:text-token-text-primary bg-transparent border-0 focus:outline-none focus:ring-0 resize-none max-h-[25dvh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600" 
+                            placeholder="Ask anything..." 
+                            rows="2"
+                            data-virtualkeyboard="true"
+                        ></textarea>
+                    </div>
                 </div>
+
+                <!-- Footer Actions -->
+                <div data-testid="composer-footer-actions" class="absolute bottom-2.5 flex items-center max-xs:gap-1 gap-2 overflow-x-auto [scrollbar-width:none]" style="inset-inline-start: calc(2.5*var(--spacing)); inset-inline-end: 60px;">
+                    <!-- Attach Button -->
+                    <div data-testid="composer-action-file-upload" style="view-transition-name:var(--vt-composer-attach-file-action)">
+                        <div class="relative">
+                            <span class="flex" data-state="closed">
+                                <div class="flex" type="button" id="radix-attach" aria-haspopup="menu" aria-expanded="false" data-state="closed">
+                                    <button 
+                                        aria-label="Add photos & files" 
+                                        class="flex items-center justify-center h-9 rounded-full border border-token-border-default text-token-text-secondary min-w-8 w-auto p-2 text-[13px] font-semibold radix-state-open:bg-black/10 hover:bg-token-main-surface-secondary dark:hover:bg-token-main-surface-secondary"
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon">
+                                            <path d="M4.33496 12.5V7.5C4.33496 7.13273 4.63273 6.83496 5 6.83496C5.36727 6.83496 5.66504 7.13273 5.66504 7.5V12.5C5.66504 14.8942 7.60585 16.835 10 16.835C12.3942 16.835 14.335 14.8942 14.335 12.5V5.83301C14.3348 4.35959 13.1404 3.16522 11.667 3.16504C10.1934 3.16504 8.99822 4.35948 8.99805 5.83301V12.5C8.99805 13.0532 9.44679 13.502 10 13.502C10.5532 13.502 11.002 13.0532 11.002 12.5V7.5C11.002 7.13273 11.2997 6.83496 11.667 6.83496C12.0341 6.83514 12.332 7.13284 12.332 7.5V12.5C12.332 13.7877 11.2877 14.832 10 14.832C8.71226 14.832 7.66797 13.7877 7.66797 12.5V5.83301C7.66814 3.62494 9.45888 1.83496 11.667 1.83496C13.875 1.83514 15.6649 3.62505 15.665 5.83301V12.5C15.665 15.6287 13.1287 18.165 10 18.165C6.87131 18.165 4.33496 15.6287 4.33496 12.5Z"></path>
+                                        </svg>
+                                        <span class="[display:var(--force-hide-label)] ps-1 pe-1 whitespace-nowrap" data-is-collapsable-label="">Attach</span>
+                                    </button>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div data-testid="system-hint-search" style="view-transition-name:var(--vt-composer-search-action)">
+                        <span class="inline-block" data-state="closed">
+                            <div class="radix-state-open:bg-black/10 inline-flex h-9 rounded-full border text-[13px] font-medium text-token-text-secondary border-token-border-default hover:bg-token-main-surface-secondary dark:hover:bg-token-main-surface-secondary">
+                                <button 
+                                    class="flex h-full min-w-8 items-center justify-center p-2" 
+                                    data-testid="composer-button-search" 
+                                    aria-pressed="false" 
+                                    aria-label="Search"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon">
+                                        <path d="M10 2.125C14.3492 2.125 17.875 5.65076 17.875 10C17.875 14.3492 14.3492 17.875 10 17.875C5.65076 17.875 2.125 14.3492 2.125 10C2.125 5.65076 5.65076 2.125 10 2.125ZM7.88672 10.625C7.94334 12.3161 8.22547 13.8134 8.63965 14.9053C8.87263 15.5194 9.1351 15.9733 9.39453 16.2627C9.65437 16.5524 9.86039 16.625 10 16.625C10.1396 16.625 10.3456 16.5524 10.6055 16.2627C10.8649 15.9733 11.1274 15.5194 11.3604 14.9053C11.7745 13.8134 12.0567 12.3161 12.1133 10.625H7.88672ZM3.40527 10.625C3.65313 13.2734 5.45957 15.4667 7.89844 16.2822C7.7409 15.997 7.5977 15.6834 7.4707 15.3486C6.99415 14.0923 6.69362 12.439 6.63672 10.625H3.40527ZM13.3633 10.625C13.3064 12.439 13.0059 14.0923 12.5293 15.3486C12.4022 15.6836 12.2582 15.9969 12.1006 16.2822C14.5399 15.467 16.3468 13.2737 16.5947 10.625H13.3633ZM12.1006 3.7168C12.2584 4.00235 12.4021 4.31613 12.5293 4.65137C13.0059 5.90775 13.3064 7.56102 13.3633 9.375H16.5947C16.3468 6.72615 14.54 4.53199 12.1006 3.7168ZM10 3.375C9.86039 3.375 9.65437 3.44756 9.39453 3.7373C9.1351 4.02672 8.87263 4.48057 8.63965 5.09473C8.22547 6.18664 7.94334 7.68388 7.88672 9.375H12.1133C12.0567 7.68388 11.7745 6.18664 11.3604 5.09473C11.1274 4.48057 10.8649 4.02672 10.6055 3.7373C10.3456 3.44756 10.1396 3.375 10 3.375ZM7.89844 3.7168C5.45942 4.53222 3.65314 6.72647 3.40527 9.375H6.63672C6.69362 7.56102 6.99415 5.90775 7.4707 4.65137C7.59781 4.31629 7.74073 4.00224 7.89844 3.7168Z"></path>
+                                    </svg>
+                                    <span style="width:fit-content;opacity:1;transform:none">
+                                        <div class="[display:var(--force-hide-label)] ps-1 pe-1 font-semibold whitespace-nowrap">Search</div>
+                                    </span>
+                                </button>
+                            </div>
+                        </span>
+                    </div>
+
+
+                    <!-- Submit Button -->
+                    <div data-testid="composer-action-submit" style="view-transition-name:var(--vt-composer-submit-action)">
+                        <button 
+                            id="submit-question" 
+                            class="flex items-center justify-center h-9 w-9 rounded-full bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+                            aria-label="Send prompt"
+                            data-testid="send-button"
+                        >
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="icon">
+                                <path d="M8.99992 16V6.41407L5.70696 9.70704C5.31643 10.0976 4.68342 10.0976 4.29289 9.70704C3.90237 9.31652 3.90237 8.6835 4.29289 8.29298L9.29289 3.29298L9.36907 3.22462C9.76184 2.90427 10.3408 2.92686 10.707 3.29298L15.707 8.29298L15.7753 8.36915C16.0957 8.76192 16.0731 9.34092 15.707 9.70704C15.3408 10.0732 14.7618 10.0958 14.3691 9.7754L14.2929 9.70704L10.9999 6.41407V16C10.9999 16.5523 10.5522 17 9.99992 17C9.44764 17 8.99992 16.5523 8.99992 16Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            <p class="error text-red-500 mt-2 text-center text-xs" id="question-error"></p>
+        </div>
+    </form>
+</div>
+
+
+
+كمان الفورم بالكامل يكون رصاصي
+border-color
+#2b2929 الفورم بالكامل 
+#2b2b2b  اللي النموذج هيرد فيها  والمستخدم هيبعت فيها واللي هيبعته يكون في فورم باللون ده 
+
+بالنسبه ل 
+
+Ask Mark AI
+
+ف انا عايز 
+Mark AI
+تكون باللون 
+
+#07132b
+ وتكون ظاهره بححم ظاهر وملفت 
+
+
+
+
+
+
+بدون ما استبدل اي حاجه غير الكود اللي انا ارسلته اليك فقط 
+
+
+لدي هذا 
+
+// ضبط ارتفاع textarea تلقائيًا
+document.getElementById('question-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 70) + 'px';
+});
+
+// إرسال الرسالة عند الضغط على Enter
+document.getElementById('question-input').addEventListener('keydown', async function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const question = this.value.trim();
+        const errorEl = document.getElementById('question-error');
+        const chatHistory = document.getElementById('chat-history');
+        if (!question) {
+            errorEl.textContent = 'Please enter a question.';
+            return;
+        }
+        try {
+            errorEl.textContent = 'Loading...';
+            const response = await fetch(`${API_URL}/api/ask`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                messageDiv.innerHTML = `
+                    <p><strong>You:</strong> ${question}</p>
+                    <p><strong>Assistant:</strong> ${data.answer}</p>
+                `;
+                chatHistory.appendChild(messageDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                errorEl.textContent = '';
+                this.value = '';
+                this.style.height = '40px'; // إعادة تعيين الارتفاع
+            } else {
+                errorEl.textContent = data.error || 'Failed to get an answer.';
+            }
+        } catch (error) {
+            errorEl.textContent = 'Failed to get an answer: ' + error.message;
+        }
+    }
+});
+
+
+تاكد من الدقه 

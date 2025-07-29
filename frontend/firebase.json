@@ -13,8 +13,24 @@
                 "destination": "/admin/index.html"
             },
             {
+                "source": "/profile/{nickname}",
+                "destination": "/profile.html"
+            },
+            {
+                "source": "/profile/me",
+                "destination": "/profile.html"
+            },
+            {
+                "source": "/settings",
+                "destination": "/settings.html"
+            },
+            {
                 "source": "/admin/comments",
                 "destination": "/admin/comments.html"
+            },
+            {
+                "source": "/admin/users",
+                "destination": "/admin/users.html"
             },
             {
                 "source": "/login",

@@ -172,7 +172,7 @@ function toggleMenu() {
 // });
 
 
-// التوليد 
+// التوليد سابت وخاص بالادمن 
 document.getElementById('downloadCv').addEventListener('click', (e) => {
     e.preventDefault();
     const link = document.createElement('a');
@@ -182,3 +182,33 @@ document.getElementById('downloadCv').addEventListener('click', (e) => {
     link.click();
     document.body.removeChild(link);
 });
+
+
+document.getElementById('search-input')?.addEventListener('input', async (e) => {
+    const query = e.target.value.trim();
+    if (query.length < 2) return;
+    try {
+        const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`);
+        const users = await response.json();
+        const searchResults = document.createElement('div');
+        searchResults.id = 'search-results';
+        searchResults.className = 'absolute bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg';
+        searchResults.innerHTML = users.length ? users.map(user => `
+            <a href="${user.profileUrl}" class="block p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <img src="${user.avatar || '/assets/img/default-avatar.png'}" alt="${user.nickname || user.username}" class="inline-block w-8 h-8 rounded-full">
+                ${user.nickname || user.username}
+            </a>
+        `).join('') : '<p>No users found</p>';
+        document.getElementById('search-input').parentElement.appendChild(searchResults);
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+});
+
+document.addEventListener('click', (e) => {
+    const searchResults = document.getElementById('search-results');
+    if (searchResults && !e.target.closest('#search-input') && !e.target.closest('#search-results')) {
+        searchResults.remove();
+    }
+});
+

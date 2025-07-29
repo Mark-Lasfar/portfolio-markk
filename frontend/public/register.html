@@ -5,75 +5,585 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --first-color: #1d4ed8;
+            --second-color: #4b5563;
+            --primary-color: #fff;
+            --primary-color-2: #f3f4f6;
+            --container-border: #d1d5db;
+            --text-color: #1f2937;
+            --background-color: #f9fafb;
+            --border-color: #d1d5db;
+            --input-bg: #fff;
+        }
+        [data-theme="dark"] {
+            --first-color: #3b82f6;
+            --second-color: #9ca3af;
+            --primary-color: #1f2937;
+            --primary-color-2: #374151;
+            --container-border: #4b5563;
+            --text-color: #f3f4f6;
+            --background-color: #111827;
+            --border-color: #6b7280;
+            --input-bg: #374151;
+        }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+        .l-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav__logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .nav__logo img {
+            width: 2rem;
+            height: 2rem;
+            margin-right: 0.5rem;
+            object-fit: contain;
+        }
+        .nav__list {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .nav__link {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .nav__link:hover {
+            background-color: var(--first-color);
+            color: #fff;
+        }
+        #theme-toggle img {
+            width: 1.1rem;
+            height: 1.1rem;
+            vertical-align: middle;
+            transition: transform 0.3s;
+        }
+        #theme-toggle:hover img {
+            transform: rotate(15deg);
+        }
+        #search-input {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            width: 100%;
+            max-width: 150px;
+            font-size: 0.9rem;
+        }
+        #search-results {
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 150px;
+            z-index: 1000;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .register-container {
+            max-width: 32rem;
+            width: 95%;
+            margin: 5rem auto 2rem;
+            padding: 2rem;
+            background: var(--primary-color);
+            border: 1px solid var(--container-border);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        .error {
+            color: #ef4444;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        input, button {
+            transition: all 0.3s;
+        }
+        .social-login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .social-login-btn:hover {
+            background: var(--first-color);
+            color: #fff;
+            border-color: var(--first-color);
+            transform: translateY(-2px);
+        }
+        .social-login-btn i {
+            font-size: 1.5rem;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .loader-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--first-color);
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media screen and (max-width: 768px) {
+            .nav__menu {
+                position: fixed;
+                top: 3rem;
+                right: -100%;
+                width: 70%;
+                max-width: 300px;
+                height: calc(100vh - 3rem);
+                background-color: var(--primary-color);
+                transition: right 0.3s ease;
+                z-index: 1000;
+                padding: 1rem;
+                box-shadow: -2px 0 6px rgba(0, 0, 0, 0.2);
+            }
+            .nav__menu.show {
+                right: 0;
+            }
+            .nav__list {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            .nav__item {
+                width: 100%;
+            }
+            .nav__link {
+                display: block;
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
+            }
+            #theme-toggle img {
+                width: 1rem;
+                height: 1rem;
+            }
+            #search-input, #search-results {
+                max-width: 100%;
+            }
+            .register-container {
+                margin: 4rem auto 1rem;
+                padding: 1.5rem;
+            }
+            .nav__logo {
+                font-size: 1rem;
+            }
+            .nav__logo img {
+                width: 1.75rem;
+                height: 1.75rem;
+            }
+            .nav__toggle {
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: var(--text-color);
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .nav {
+                padding: 0.5rem;
+            }
+            .nav__logo {
+                font-size: 0.95rem;
+            }
+            .nav__logo img {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+            .register-container {
+                width: 98%;
+                padding: 1rem;
+            }
+            .social-login-btn {
+                font-size: 0.85rem;
+            }
+            .social-login-btn i {
+                font-size: 1.25rem;
+            }
+            #theme-toggle img {
+                width: 0.9rem;
+                height: 0.9rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen transition-colors duration-300">
-    <div class="container max-w-md bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Register</h1>
-        <div class="register-form">
-            <input type="text" id="username" placeholder="Username (optional)" class="w-full p-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-            <input type="email" id="email" placeholder="Email" class="w-full p-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-            <input type="password" id="password" placeholder="Password (min 8 characters)" class="w-full p-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-            <button id="register-btn" class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Register</button>
-            <p class="error text-red-500 mt-4" id="register-error"></p>
-            <p class="text-gray-700 dark:text-gray-300 mt-4">Already have an account? <a href="/login.html" class="text-blue-500 hover:underline">Login</a></p>
-            <button class="oauth-btn google w-full p-3 mt-4 bg-red-600 text-white rounded-lg hover:bg-red-700" onclick="window.location.href=`${window.ENV.API_URL}/auth/google`">Register with Google</button>
-            <button class="oauth-btn facebook w-full p-3 mt-4 bg-blue-800 text-white rounded-lg hover:bg-blue-900" onclick="window.location.href=`${window.ENV.API_URL}/auth/facebook`">Register with Facebook</button>
-            <button class="oauth-btn github w-full p-3 mt-4 bg-gray-800 text-white rounded-lg hover:bg-gray-900" onclick="window.location.href=`${window.ENV.API_URL}/auth/github`">Register with GitHub</button>
-        </div>
+<body>
+    <header class="l-header">
+        <nav class="nav bd-grid">
+            <a href="/" class="nav__logo"><img src="/assets/img/logo.svg" alt="Portfolio Logo"> <span id="portfolio-name">Portfolio</span></a>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <input type="text" id="search-input" placeholder="Search users..." class="p-2 rounded-lg border border-gray-300 dark:border-gray-600">
+                        <div id="search-results" class="hidden"></div>
+                    </li>
+                    <li class="nav__item"><a href="/" class="nav__link">Home</a></li>
+                    <li class="nav__item"><a href="/profile/me" class="nav__link" id="profile-link" style="display: none;">Profile</a></li>
+                    <li class="nav__item"><a href="/admin" class="nav__link" id="admin-link" style="display: none;">Admin</a></li>
+                    <li class="nav__item"><a href="/login.html" class="nav__link" id="login-link">Login</a></li>
+                    <li class="nav__item"><a href="/register.html" class="nav__link" id="register-link" style="display: none;">Register</a></li>
+                    <li class="nav__item"><a href="#" class="nav__link" id="logout-link" style="display: none;">Logout</a></li>
+                    <li class="nav__item"><a href="#" class="nav__link" id="theme-toggle">
+                        <img id="modeToggle" class="icon color-icon"
+                             src="/assets/img/theme_light.png"
+                             src-light="/assets/img/theme_light.png"
+                             src-dark="/assets/img/theme_dark.png"
+                             alt="Color theme icon" />
+                    </a></li>
+                </ul>
+            </div>
+            <div class="nav__toggle" id="nav-toggle">
+                <i class='bx bx-menu'></i>
+            </div>
+        </nav>
+    </header>
+
+    <div id="loader">
+        <div class="loader-spinner"></div>
     </div>
+
+    <div class="register-container">
+        <h2 class="text-xl md:text-2xl font-semibold text-center mb-4 text-gray-900 dark:text-white">Create Your Account</h2>
+        <p class="error" id="register-error"></p>
+        <div id="register-form">
+            <div class="relative mb-4">
+                <input type="text" id="username" placeholder="Username" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="relative mb-4">
+                <input type="email" id="email" placeholder="Email" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="relative mb-4">
+                <input type="password" id="password" placeholder="Password" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+                <button type="button" id="toggle-password" class="absolute inset-y-0 right-2 flex items-center text-gray-600 dark:text-gray-300">
+                    <i class='bx bx-show'></i>
+                </button>
+            </div>
+            <button id="register-btn" class="w-full p-2.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors focus:ring-2 focus:ring-blue-500">Register</button>
+            <div class="divider">or</div>
+            <div class="grid grid-cols-1 gap-3">
+                <a href="/auth/google" class="social-login-btn">
+                    <i class='bx bxl-google'></i> Sign up with Google
+                </a>
+                <a href="/auth/facebook" class="social-login-btn">
+                    <i class='bx bxl-facebook'></i> Sign up with Facebook
+                </a>
+                <a href="/auth/github" class="social-login-btn">
+                    <i class='bx bxl-github'></i> Sign up with GitHub
+                </a>
+            </div>
+        </div>
+        <p class="mt-4 text-center text-sm">Already have an account? <a href="/login.html" class="text-blue-500 hover:underline">Login</a></p>
+    </div>
+
     <script src="/assets/js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         const API_URL = window.ENV.API_URL;
+        let userToken = localStorage.getItem('userToken');
 
-document.getElementById('register-btn').addEventListener('click', async () => {
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const errorEl = document.getElementById('register-error');
-
-    if (!email) {
-        errorEl.textContent = 'Please enter an email address.';
-        return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errorEl.textContent = 'Please enter a valid email address.';
-        return;
-    }
-    if (!password || password.length < 8) {
-        errorEl.textContent = 'Password must be at least 8 characters long.';
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/api/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password })
-        });
-        const data = await response.json();
-        if (data.token) {
-            localStorage.setItem('userToken', data.token);
-            window.location.href = '/';
-        } else {
-            errorEl.textContent = data.error || 'Registration failed. Please try again.';
-        }
-    } catch (error) {
-        errorEl.textContent = 'Registration failed: ' + error.message;
-    }
-});
-
-
-
-        window.addEventListener('load', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            if (token) {
-                localStorage.setItem('userToken', token);
-                window.location.href = '/';
-            } else if (localStorage.getItem('userToken')) {
-                // إذا كان هناك توكن بالفعل، أعد التوجيه إلى الصفحة الرئيسية
-                window.location.href = '/';
+        // Hide loader and initialize theme on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loader').style.display = 'none';
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const modeToggle = document.getElementById('modeToggle');
+            modeToggle.src = savedTheme === 'light' ? modeToggle.getAttribute('src-light') : modeToggle.getAttribute('src-dark');
+            updateNav();
+            // Hide register link if on register page
+            if (window.location.pathname === '/register.html') {
+                document.getElementById('register-link').style.display = 'none';
+                document.getElementById('login-link').style.display = 'block';
             }
+        });
+
+        // Handle register button click
+        document.getElementById('register-btn').addEventListener('click', async () => {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('register-error');
+            const registerBtn = document.getElementById('register-btn');
+            const loader = document.getElementById('loader');
+
+            if (!username || !email || !password) {
+                errorEl.textContent = 'Please enter username, email, and password.';
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errorEl.textContent = 'Invalid email format.';
+                return;
+            }
+
+            if (password.length < 8) {
+                errorEl.textContent = 'Password must be at least 8 characters long.';
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Registering...';
+            loader.style.display = 'flex';
+
+            try {
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    throw new Error('Invalid server response');
+                }
+                if (!response.ok) {
+                    throw new Error(data.error || 'Registration failed');
+                }
+                localStorage.setItem('userToken', data.token);
+                localStorage.setItem('refreshToken', data.refreshToken);
+                Toastify({
+                    text: 'Registration successful! Redirecting to profile...',
+                    duration: 3000,
+                    style: { background: '#10b981' }
+                }).showToast();
+                setTimeout(() => {
+                    window.location.href = '/profile/me';
+                }, 1000);
+            } catch (error) {
+                console.error('Registration error:', error);
+                Toastify({
+                    text: `Registration failed: ${error.message}`,
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            } finally {
+                loader.style.display = 'none';
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            }
+        });
+
+        // Toggle password visibility
+        document.getElementById('toggle-password').addEventListener('click', () => {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggle-password').querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bx-show');
+                toggleIcon.classList.add('bx-hide');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bx-hide');
+                toggleIcon.classList.add('bx-show');
+            }
+        });
+
+        // Update navigation bar based on user authentication
+        async function updateNav() {
+            try {
+                const response = await fetch(`${API_URL}/api/verify-token`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('login-link').style.display = 'none';
+                    document.getElementById('register-link').style.display = 'none';
+                    document.getElementById('profile-link').style.display = 'block';
+                    document.getElementById('logout-link').style.display = 'block';
+                    if (data.isAdmin) {
+                        document.getElementById('admin-link').style.display = 'block';
+                    }
+                } else {
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('refreshToken');
+                    document.getElementById('login-link').style.display = window.location.pathname === '/login.html' ? 'none' : 'block';
+                    document.getElementById('register-link').style.display = window.location.pathname === '/register.html' ? 'none' : 'block';
+                    document.getElementById('profile-link').style.display = 'none';
+                    document.getElementById('logout-link').style.display = 'none';
+                    document.getElementById('admin-link').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error verifying token:', error);
+                document.getElementById('login-link').style.display = window.location.pathname === '/login.html' ? 'none' : 'block';
+                document.getElementById('register-link').style.display = window.location.pathname === '/register.html' ? 'none' : 'block';
+                document.getElementById('profile-link').style.display = 'none';
+                document.getElementById('logout-link').style.display = 'none';
+                document.getElementById('admin-link').style.display = 'none';
+            }
+        }
+
+        // Handle search functionality
+        async function loadSearchResults(query) {
+            try {
+                const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
+                    headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch search results');
+                }
+                const users = await response.json();
+                const searchResults = document.getElementById('search-results');
+                searchResults.classList.remove('hidden');
+                searchResults.innerHTML = users.length ? users.map(user => `
+                    <a href="${user.profileUrl}" class="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <img src="${user.avatar || '/assets/img/default-avatar.png'}" alt="${user.nickname || user.username}" class="inline-block w-8 h-8 rounded-full mr-2">
+                        ${user.nickname || user.username}
+                    </a>
+                `).join('') : '<p class="p-2">No users found.</p>';
+            } catch (error) {
+                console.error('Error searching users:', error);
+                document.getElementById('search-results').innerHTML = '<p class="p-2">Error searching users: ' + error.message;
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 2) {
+                loadSearchResults(query);
+            } else {
+                document.getElementById('search-results').classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const searchResults = document.getElementById('search-results');
+            if (searchResults && !e.target.closest('#search-input') && !e.target.closest('#search-results')) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        // Handle logout
+        document.getElementById('logout-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch(`${API_URL}/api/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') })
+                });
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('refreshToken');
+                userToken = null;
+                await updateNav();
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout failed:', error);
+                Toastify({
+                    text: 'Error during logout',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        });
+
+        // Handle theme toggle
+        document.getElementById('theme-toggle').addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            const modeToggle = document.getElementById('modeToggle');
+            modeToggle.src = newTheme === 'light' ? modeToggle.getAttribute('src-light') : modeToggle.getAttribute('src-dark');
+            document.body.classList.toggle('theme-transition');
+            setTimeout(() => document.body.classList.remove('theme-transition'), 300);
+        });
+
+        // Handle mobile menu toggle
+        document.getElementById('nav-toggle').addEventListener('click', () => {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('show');
+        });
+
+        // Close menu when clicking a nav link
+        document.querySelectorAll('.nav__link').forEach(link => {
+            link.addEventListener('click', () => {
+                const navMenu = document.getElementById('nav-menu');
+                navMenu.classList.remove('show');
+            });
         });
     </script>
 </body>

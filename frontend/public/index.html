@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <link rel="icon" href="/assets/img/mark.png">
+    <link rel="icon" href="/assets/img/logo.svg">
     <!-- Boxicons -->
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -352,7 +352,12 @@
             text-align: center;
         }
 
-        @media screen and (max-width: 768px) {
+    @media screen and (max-width: 768px) {
+
+                .nav__logo img {
+        width: 32px; /* تصغير الشعار على الشاشات الصغيرة */
+        height: 32px;
+    }
   .home {
     min-height: 100vh; /* خليها تملى الشاشة */
     display: flex;
@@ -507,6 +512,27 @@
     transition: height 0.2s ease;
 }
 
+.nav__logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.nav__logo img {
+    width: 40px; /* حجم الشعار الافتراضي */
+    height: 40px;
+    object-fit: contain; /* يضمن ظهور الشعار بالكامل دون تشويه */
+    margin-right: 0.5rem; /* مسافة بسيطة على اليمين إذا تمت إضافة عناصر أخرى لاحقًا */
+    vertical-align: middle; /* محاذاة الصورة مع الخط الأساسي */
+    transition: transform 0.3s ease; /* تأثير انتقال سلس عند التفاعل */
+}
+
+/* تأثير عند التمرير فوق الشعار */
+.nav__logo img:hover {
+    transform: scale(1.1); /* تكبير طفيف عند التمرير لتحسين التفاعل */
+}
+
+
     </style>
 </head>
 <body id="by" onclick="playMusic()">
@@ -523,29 +549,37 @@
 
     <header class="l-header">
         <nav class="nav bd-grid">
-            <a href="#" class="nav__logo">Ibrahim
+            <a href="/" class="nav__logo"><img src="/assets/img/logo.svg" alt="Portfolio Logo"> 
                 <audio autoplay loop id="music" src="assets/au/au.mp3"></audio>
             </a>
             <div class="nav__menu" id="nav-menu">
                 <ul class="nav__list">
+
+                    <li class="nav__item">
+                        <input type="text" id="search-input" placeholder="Search users..." class="p-2 rounded-lg border border-gray-300 dark:border-gray-600">
+                        <div id="search-results" class="hidden"></div>
+                    </li>
+
                     <li class="nav__item"><a href="#home" class="nav__link active">Home</a></li>
                     <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
                     <li class="nav__item"><a href="#skills" class="nav__link">Skills</a></li>
                     <li class="nav__item"><a href="#work" class="nav__link">Work</a></li>
                     <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
                     <li class="nav__item"><a href="#footer" class="nav__link">Footer</a></li>
-                    <li class="nav__item"><a href="/admin" class="nav__link">Admin</a></li>
+                    <li class="nav__item"><a href="/admin" class="nav__link" id="admin-link">Admin</a></li>
+                    <li class="nav__item"><a href="/profile/me" class="nav__link" id="profile-link" style="display: none;">My Profile</a></li>
                     <li class="nav__item"><a href="/login.html" class="nav__link" id="login-link">Login</a></li>
                     <li class="nav__item"><a href="/register.html" class="nav__link" id="register-link">Register</a></li>
                     <li class="nav__item"><a href="#" class="nav__link" id="logout-link" style="display: none;">Logout</a></li>
                     <li>
-<a href="#" class="nav__link" id="theme-toggle">
-        <img id="modeToggle" class="icon color-icon"
-             src="assets/img/theme_light.png"
-             src-light="assets/img/theme_light.png"
-             src-dark="assets/img/theme_dark.png"
-             alt="Color theme icon" />
-    </a>
+                        <a href="#" class="nav__link" id="theme-toggle">
+                            <img id="modeToggle" class="icon color-icon"
+                                src="/assets/img/theme_light.png"
+                                src-light="/assets/img/theme_light.png"
+                                src-dark="/assets/img/theme_dark.png"
+                                alt="Color theme icon"
+                            />
+                        </a>
                     </li>
 
                 </ul>
@@ -842,6 +876,56 @@ document.getElementById('theme-toggle')?.addEventListener('click', (e) => {
     setTheme(newTheme);
 });
 
+
+async function updateNav() {
+    const loginLink = document.getElementById('login-link');
+    const registerLink = document.getElementById('register-link');
+    const logoutLink = document.getElementById('logout-link');
+    const profileLink = document.getElementById('profile-link');
+    const adminLink = document.getElementById('admin-link');
+    const userToken = localStorage.getItem('userToken');
+
+    if (userToken) {
+        try {
+            const response = await fetch(`${API_URL}/api/verify-token`, {
+                headers: { 'Authorization': `Bearer ${userToken}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                loginLink.style.display = 'none';
+                registerLink.style.display = 'none';
+                logoutLink.style.display = 'block';
+                profileLink.style.display = 'block';
+                profileLink.href = `/profile/${data.profile?.nickname || data.username || 'me'}`;
+                adminLink.style.display = data.isAdmin ? 'block' : 'none';
+            } else {
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('refreshToken');
+                loginLink.style.display = 'block';
+                registerLink.style.display = 'block';
+                logoutLink.style.display = 'none';
+                profileLink.style.display = 'none';
+                adminLink.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error verifying token:', error);
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('refreshToken');
+            loginLink.style.display = 'block';
+            registerLink.style.display = 'block';
+            logoutLink.style.display = 'none';
+            profileLink.style.display = 'none';
+            adminLink.style.display = 'none';
+        }
+    } else {
+        loginLink.style.display = 'block';
+        registerLink.style.display = 'block';
+        logoutLink.style.display = 'none';
+        profileLink.style.display = 'none';
+        adminLink.style.display = 'none';
+    }
+}
+// استدعاء updateNav عند تحميل الصفحة
 window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
@@ -850,26 +934,25 @@ window.addEventListener('DOMContentLoaded', () => {
     loadSkills();
 });
 
-function updateNav() {
-    const loginLink = document.getElementById('login-link');
-    const registerLink = document.getElementById('register-link');
-    const logoutLink = document.getElementById('logout-link');
-    if (userToken) {
-        loginLink.style.display = 'none';
-        registerLink.style.display = 'none';
-        logoutLink.style.display = 'block';
-    } else {
-        loginLink.style.display = 'block';
-        registerLink.style.display = 'block';
-        logoutLink.style.display = 'none';
-    }
-}
-
-document.getElementById('logout-link').addEventListener('click', (e) => {
+document.getElementById('logout-link').addEventListener('click', async (e) => {
     e.preventDefault();
+    const userToken = localStorage.getItem('userToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    try {
+        await fetch(`${API_URL}/api/logout`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userToken}`
+            },
+            body: JSON.stringify({ refreshToken })
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
     localStorage.removeItem('userToken');
-    userToken = null;
-    updateNav();
+    localStorage.removeItem('refreshToken');
+    await updateNav();
     window.location.href = '/';
 });
 
@@ -949,19 +1032,27 @@ async function loadProjects() {
 
 async function loadComments(projectId) {
     try {
-        const response = await fetch(`${API_URL}/api/comments/${projectId}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
-        });
-        if (response.status === 401 || response.status === 403) {
-            localStorage.removeItem('userToken');
-            userToken = null;
-            updateNav();
-            document.getElementById('user-login').style.display = 'block';
-            document.getElementById('user-rating').style.display = 'none';
-            document.getElementById('user-comment').style.display = 'none';
-            document.getElementById('comment-error').textContent = 'Session expired. Please log in again.';
-            return;
+        let isAdmin = false;
+        if (userToken) {
+            const tokenResponse = await fetch(`${API_URL}/api/verify-token`, {
+                headers: { 'Authorization': `Bearer ${userToken}` }
+            });
+            if (!tokenResponse.ok) {
+                localStorage.removeItem('userToken');
+                userToken = null;
+                updateNav();
+                document.getElementById('user-login').style.display = 'block';
+                document.getElementById('user-rating').style.display = 'none';
+                document.getElementById('user-comment').style.display = 'none';
+                document.getElementById('comment-error').textContent = 'Session expired. Please log in again.';
+                return;
+            }
+            const tokenData = await tokenResponse.json();
+            isAdmin = tokenData.isAdmin;
         }
+        const response = await fetch(`${API_URL}/api/comments/${projectId}`, {
+            headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+        });
         if (!response.ok) throw new Error('Failed to fetch comments: ' + (await response.text()));
         const comments = await response.json();
         const commentsSection = document.getElementById('comments-section');
@@ -973,7 +1064,7 @@ async function loadComments(projectId) {
                 <strong>${comment.userId?.username || 'Anonymous'}: ${'★'.repeat(comment.rating)}</strong>
                 <p>${comment.text}</p>
                 ${comment.replies.map(reply => `<div class="reply">Admin: ${reply.text} (${new Date(reply.timestamp).toLocaleString()})</div>`).join('')}
-                ${userToken ? `
+                ${userToken && isAdmin ? `
                     <button class="reply-btn" data-comment-id="${comment._id}">Reply</button>
                     <textarea class="reply-input" data-comment-id="${comment._id}" placeholder="Write a reply..." style="display: none;"></textarea>
                     <button class="submit-reply-btn" data-comment-id="${comment._id}" style="display: none;">Submit Reply</button>
@@ -1274,6 +1365,48 @@ document.getElementById('radix-attach').addEventListener('click', () => {
     };
     fileInput.click();
 });
+
+
+        async function loadSearchResults(query) {
+            try {
+                const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
+                    headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch search results');
+                }
+                const users = await response.json();
+                const searchResults = document.getElementById('search-results');
+                searchResults.classList.remove('hidden');
+                searchResults.innerHTML = users.length ? users.map(user => `
+                    <a href="${user.profileUrl}" class="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <img src="${user.avatar || '/assets/img/default-avatar.png'}" alt="${user.nickname || user.username}" class="inline-block w-8 h-8 rounded-full mr-2">
+                        ${user.nickname || user.username}
+                    </a>
+                `).join('') : '<p class="p-2">No users found.</p>';
+            } catch (error) {
+                console.error('Error searching users:', error);
+                document.getElementById('search-results').innerHTML = '<p class="p-2">Error searching users: ' + error.message;
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 2) {
+                loadSearchResults(query);
+            } else {
+                document.getElementById('search-results').classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const searchResults = document.getElementById('search-results');
+            if (searchResults && !e.target.closest('#search-input') && !e.target.closest('#search-results')) {
+                searchResults.classList.add('hidden');
+            }
+        });
+
 </script>
 </body>
 </html>

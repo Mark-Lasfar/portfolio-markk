@@ -206,9 +206,9 @@
   <script src="/assets/js/config.js"></script>
   <script>
     const API_URL = window.ENV.API_URL;
-    let adminToken = localStorage.getItem('adminToken');
+let userToken = localStorage.getItem('userToken');
 
-    // إعداد Dark Mode/Light Mode
+    //  Dark Mode/Light Mode
     function setTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
@@ -240,8 +240,8 @@
         });
         const data = await response.json();
         if (data.token) {
-          adminToken = data.token;
-          localStorage.setItem('adminToken', adminToken);
+          userToken = data.token;
+          localStorage.setItem('userToken', userToken);
           document.getElementById('admin-login').style.display = 'none';
           document.getElementById('comments-list').style.display = 'block';
           loadComments();
@@ -260,11 +260,11 @@
       try {
         // جلب جميع التعليقات
         const commentsResponse = await fetch(`${API_URL}/api/comments`, {
-          headers: { 'Authorization': `Bearer ${adminToken}` }
+          headers: { 'Authorization': `Bearer ${userToken}` }
         });
         if (!commentsResponse.ok) {
           if (commentsResponse.status === 401 || commentsResponse.status === 403) {
-            localStorage.removeItem('adminToken');
+            localStorage.removeItem('userToken');
             document.getElementById('admin-login').style.display = 'block';
             document.getElementById('comments-list').style.display = 'none';
             errorEl.textContent = 'Session expired. Please log in again.';
@@ -327,7 +327,7 @@
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${adminToken}`
+                'Authorization': `Bearer ${userToken}`
               },
               body: JSON.stringify({ text: replyText })
             });
@@ -336,8 +336,8 @@
                 errorEl.textContent = 'Session expired. Please log in again.';
                 document.getElementById('admin-login').style.display = 'block';
                 document.getElementById('comments-list').style.display = 'none';
-                localStorage.removeItem('adminToken');
-                adminToken = null;
+                localStorage.removeItem('userToken');
+                userToken = null;
                 return;
               }
               throw new Error('Failed to submit reply');
@@ -356,15 +356,15 @@
         try {
           const response = await fetch(`${API_URL}/api/comments/${commentId}`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${adminToken}` }
+            headers: { 'Authorization': `Bearer ${userToken}` }
           });
           if (!response.ok) {
             if (response.status === 401 || response.status === 403) {
               errorEl.textContent = 'Session expired. Please log in again.';
               document.getElementById('admin-login').style.display = 'block';
               document.getElementById('comments-list').style.display = 'none';
-              localStorage.removeItem('adminToken');
-              adminToken = null;
+              localStorage.removeItem('userToken');
+              userToken = null;
               return;
             }
             throw new Error('Failed to delete comment');
@@ -378,7 +378,7 @@
     });
 
     window.addEventListener('load', () => {
-      if (adminToken) {
+      if (userToken) {
         document.getElementById('admin-login').style.display = 'none';
         document.getElementById('comments-list').style.display = 'block';
         loadComments();
