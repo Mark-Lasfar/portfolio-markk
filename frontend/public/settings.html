@@ -308,29 +308,32 @@
         <h1 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Profile Settings</h1>
         <form id="profile-form">
             <div class="mb-4">
+                <label class="block text-gray-900 dark:text-white mb-1 text-sm">Portfolio Name</label>
+                <input type="text" id="portfolioName" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" placeholder="e.g., My Portfolio">
+            </div>
+            <div class="mb-4">
                 <label class="block text-gray-900 dark:text-white mb-1 text-sm">Nickname (for URL)</label>
                 <input type="text" id="nickname" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" placeholder="e.g., johndoe">
             </div>
-<div class="mb-4">
-    <label class="block text-gray-900 dark:text-white mb-1 text-sm">Profile Image</label>
-    <input type="file" id="avatar" name="avatar" accept="image/*" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
-    <p id="avatar-suggestion" class="text-xs text-gray-500 dark:text-gray-400 mt-1 hidden"></p>
-</div>
-            
             <div class="mb-4">
-    <label class="block text-gray-900 dark:text-white mb-1 text-sm">Avatar Display Type</label>
-    <select id="avatarDisplayType" name="avatarDisplayType" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
-        <option value="normal">Normal Image (Suitable for images with background)</option>
-        <option value="svg">Inside SVG (Suitable for images without background)</option>
-    </select>
-    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-        <strong>Note:</strong> Use "Inside SVG" for images with transparent backgrounds to apply a custom SVG shape and color. Use "Normal Image" for regular images with backgrounds.
-    </p>
-</div>
-<div class="mb-4" id="svgColorContainer">
-    <label class="block text-gray-900 dark:text-white mb-1 text-sm">SVG Background Color</label>
-    <input type="color" id="svgColor" name="svgColor" value="#000000" class="w-full h-10 p-1 border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500">
-</div>
+                <label class="block text-gray-900 dark:text-white mb-1 text-sm">Profile Image</label>
+                <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+                <p id="avatar-suggestion" class="text-xs text-gray-500 dark:text-gray-400 mt-1 hidden"></p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-900 dark:text-white mb-1 text-sm">Avatar Display Type</label>
+                <select id="avatarDisplayType" name="avatarDisplayType" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+                    <option value="normal">Normal Image (Suitable for images with background)</option>
+                    <option value="svg">Inside SVG (Suitable for images without background)</option>
+                </select>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <strong>Note:</strong> Use "Inside SVG" for images with transparent backgrounds to apply a custom SVG shape and color. Use "Normal Image" for regular images with backgrounds.
+                </p>
+            </div>
+            <div class="mb-4" id="svgColorContainer">
+                <label class="block text-gray-900 dark:text-white mb-1 text-sm">SVG Background Color</label>
+                <input type="color" id="svgColor" name="svgColor" value="#000000" class="w-full h-10 p-1 border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-blue-500">
+            </div>
             <div class="mb-4">
                 <label class="block text-gray-900 dark:text-white mb-1 text-sm">Job Title</label>
                 <input type="text" id="jobTitle" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" placeholder="e.g., Full Stack Developer">
@@ -340,9 +343,9 @@
                 <textarea id="bio" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" placeholder="Tell us about yourself" rows="4"></textarea>
             </div>
             <div class="mb-4">
-    <label class="block text-gray-900 dark:text-white mb-1 text-sm">Phone Number</label>
-    <input type="tel" id="phone" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" placeholder="e.g., +1234567890">
-</div>
+                <label class="block text-gray-900 dark:text-white mb-1 text-sm">Phone Number (optional)</label>
+                <input type="tel" id="phone" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" placeholder="e.g., +1234567890">
+            </div>
             <div class="mb-4">
                 <label class="block text-gray-900 dark:text-white mb-1 text-sm">Profile Visibility</label>
                 <select id="isPublic" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
@@ -351,67 +354,54 @@
                 </select>
             </div>
             <div class="mb-4">
-    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Social Links</h2>
-    <div class="dynamic-field">
-        <label class="block text-gray-900 dark:text-white mb-1 text-sm">LinkedIn</label>
-        <input type="url" name="linkedin" id="social-linkedin" placeholder="LinkedIn URL" class="mb-2">
-    </div>
-    <div class="dynamic-field">
-        <label class="block text-gray-900 dark:text-white mb-1 text-sm">Behance</label>
-        <input type="url" name="behance" id="social-behance" placeholder="Behance URL" class="mb-2">
-    </div>
-    <div class="dynamic-field">
-        <label class="block text-gray-900 dark:text-white mb-1 text-sm">GitHub</label>
-        <input type="url" name="github" id="social-github" placeholder="GitHub URL" class="mb-2">
-    </div>
-    <div class="dynamic-field">
-        <label class="block text-gray-900 dark:text-white mb-1 text-sm">WhatsApp</label>
-        <input type="tel" name="whatsapp" id="social-whatsapp" placeholder="WhatsApp Number (e.g., +1234567890)" class="mb-2">
-    </div>
-</div>
-
-            <!-- Education -->
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Social Links (optional)</h2>
+                <div class="dynamic-field">
+                    <label class="block text-gray-900 dark:text-white mb-1 text-sm">LinkedIn</label>
+                    <input type="url" name="linkedin" id="social-linkedin" placeholder="e.g., https://linkedin.com/in/username" class="mb-2">
+                </div>
+                <div class="dynamic-field">
+                    <label class="block text-gray-900 dark:text-white mb-1 text-sm">Behance</label>
+                    <input type="url" name="behance" id="social-behance" placeholder="e.g., https://behance.net/username" class="mb-2">
+                </div>
+                <div class="dynamic-field">
+                    <label class="block text-gray-900 dark:text-white mb-1 text-sm">GitHub</label>
+                    <input type="url" name="github" id="social-github" placeholder="e.g., https://github.com/username" class="mb-2">
+                </div>
+                <div class="dynamic-field">
+                    <label class="block text-gray-900 dark:text-white mb-1 text-sm">WhatsApp</label>
+                    <input type="tel" name="whatsapp" id="social-whatsapp" placeholder="e.g., +1234567890" class="mb-2">
+                </div>
+            </div>
             <div class="mb-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Education</h2>
                 <div id="education-fields"></div>
                 <button type="button" id="add-education" class="add-btn w-full p-2.5 text-sm">Add Education</button>
             </div>
-
-            <!-- Experience -->
             <div class="mb-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Experience</h2>
                 <div id="experience-fields"></div>
                 <button type="button" id="add-experience" class="add-btn w-full p-2.5 text-sm">Add Experience</button>
             </div>
-
-            <!-- Certificates -->
             <div class="mb-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Certificates</h2>
                 <div id="certificate-fields"></div>
                 <button type="button" id="add-certificate" class="add-btn w-full p-2.5 text-sm">Add Certificate</button>
             </div>
-
-            <!-- Skills -->
             <div class="mb-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Skills</h2>
                 <div id="skill-fields"></div>
                 <button type="button" id="add-skill" class="add-btn w-full p-2.5 text-sm">Add Skill</button>
             </div>
-
-            <!-- Projects -->
             <div class="mb-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Personal Profile Projects</h2>
                 <div id="project-fields"></div>
                 <button type="button" id="add-project" class="add-btn w-full p-2.5 text-sm">Add Project</button>
             </div>
-
-            <!-- Interests -->
             <div class="mb-4">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Interests</h2>
                 <div id="interest-fields"></div>
                 <button type="button" id="add-interest" class="add-btn w-full p-2.5 text-sm">Add Interest</button>
             </div>
-
             <button type="submit" class="w-full p-2.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors focus:ring-2 focus:ring-blue-500">Save Changes</button>
             <p class="error mt-4 text-sm" id="form-error"></p>
         </form>
@@ -428,12 +418,11 @@
         }
 
         function toggleSvgColorField() {
-    const avatarDisplayType = document.getElementById('avatarDisplayType').value;
-    const svgColorContainer = document.getElementById('svgColorContainer');
-    svgColorContainer.style.display = avatarDisplayType === 'svg' ? 'block' : 'none';
-}
-document.getElementById('avatarDisplayType').addEventListener('change', toggleSvgColorField);
-
+            const avatarDisplayType = document.getElementById('avatarDisplayType').value;
+            const svgColorContainer = document.getElementById('svgColorContainer');
+            svgColorContainer.style.display = avatarDisplayType === 'svg' ? 'block' : 'none';
+        }
+        document.getElementById('avatarDisplayType').addEventListener('change', toggleSvgColorField);
 
         function addDynamicField(containerId, fieldTemplate, setupLinks = false) {
             const container = document.getElementById(containerId);
@@ -452,8 +441,8 @@ document.getElementById('avatarDisplayType').addEventListener('change', toggleSv
                     const newLink = document.createElement('div');
                     newLink.className = 'link-field';
                     newLink.innerHTML = `
-                        <input type="text" name="option" placeholder="Link Option" class="mb-2">
-                        <input type="text" name="value" placeholder="Link URL" class="mb-2">
+                        <input type="text" name="option" placeholder="Link Option (e.g., Demo)" class="mb-2">
+                        <input type="url" name="value" placeholder="Link URL (e.g., https://example.com)" class="mb-2">
                         <button type="button" class="remove-link">Remove Link</button>
                     `;
                     linkContainer.appendChild(newLink);
@@ -523,59 +512,15 @@ document.getElementById('avatarDisplayType').addEventListener('change', toggleSv
             `);
         });
 
-document.getElementById('avatar').addEventListener('change', async () => {
-    const avatar = document.getElementById('avatar').files[0];
-    if (avatar) {
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (avatar.size > maxSize) {
-            Toastify({
-                text: 'Avatar image size exceeds 5MB limit.',
-                duration: 3000,
-                style: { background: '#ef4444' }
-            }).showToast();
-            document.getElementById('avatar').value = '';
-            return;
-        }
-        const formData = new FormData();
-        formData.append('avatar', avatar);
-        try {
-            const response = await fetch('/api/profile', {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                body: formData
-            });
-            const data = await response.json();
-            if (data.success) {
-                const suggestion = document.getElementById('avatar-suggestion');
-                suggestion.classList.remove('hidden');
-                if (data.hasTransparency) {
-                    suggestion.textContent = 'This image has a transparent background. We recommend using "Inside SVG" for a better look.';
-                    document.getElementById('avatarDisplayType').value = 'svg';
-                } else {
-                    suggestion.textContent = 'This image has a background. We recommend using "Normal Image" for best results.';
-                    document.getElementById('avatarDisplayType').value = 'normal';
-                }
-                toggleSvgColorField();
-            }
-        } catch (error) {
-            Toastify({
-                text: 'Error checking image transparency.',
-                duration: 3000,
-                style: { background: '#ef4444' }
-            }).showToast();
-        }
-    }
-});
-
         document.addEventListener('change', function(e) {
-            if (e.target.matches('#project-fields input[name="image"]')) {
+            if (e.target.matches('#avatar, #project-fields input[name="image"]')) {
                 const file = e.target.files[0];
                 const maxSize = 5 * 1024 * 1024; // 5MB
                 const allowedTypes = ['image/jpeg', 'image/png'];
                 if (file) {
                     if (!allowedTypes.includes(file.type)) {
                         Toastify({
-                            text: 'Only JPEG or PNG images are allowed for projects.',
+                            text: `Only JPEG or PNG images are allowed for ${e.target.id === 'avatar' ? 'avatar' : 'project'}.`,
                             duration: 3000,
                             style: { background: '#ef4444' }
                         }).showToast();
@@ -584,7 +529,7 @@ document.getElementById('avatar').addEventListener('change', async () => {
                     }
                     if (file.size > maxSize) {
                         Toastify({
-                            text: 'Project image size exceeds 5MB limit.',
+                            text: `${e.target.id === 'avatar' ? 'Avatar' : 'Project'} image size exceeds 5MB limit.`,
                             duration: 3000,
                             style: { background: '#ef4444' }
                         }).showToast();
@@ -599,21 +544,20 @@ document.getElementById('avatar').addEventListener('change', async () => {
             e.preventDefault();
             const formData = new FormData();
             const loader = document.getElementById('loader');
+            const portfolioName = document.getElementById('portfolioName').value.trim();
             const nickname = document.getElementById('nickname').value.trim();
             const jobTitle = document.getElementById('jobTitle').value.trim();
             const bio = document.getElementById('bio').value.trim();
-            const isPublic = document.getElementById('isPublic').value;
             const phone = document.getElementById('phone').value.trim();
-const socialLinks = {
-    linkedin: document.getElementById('social-linkedin').value.trim(),
-    behance: document.getElementById('social-behance').value.trim(),
-    github: document.getElementById('social-github').value.trim(),
-    whatsapp: document.getElementById('social-whatsapp').value.trim()
-};
-const avatarDisplayType = document.getElementById('avatarDisplayType').value;
-const svgColor = document.getElementById('svgColor').value;
-formData.append('avatarDisplayType', avatarDisplayType);
-formData.append('svgColor', svgColor);
+            const isPublic = document.getElementById('isPublic').value;
+            const socialLinks = {
+                linkedin: document.getElementById('social-linkedin').value.trim(),
+                behance: document.getElementById('social-behance').value.trim(),
+                github: document.getElementById('social-github').value.trim(),
+                whatsapp: document.getElementById('social-whatsapp').value.trim()
+            };
+            const avatarDisplayType = document.getElementById('avatarDisplayType').value;
+            const svgColor = document.getElementById('svgColor').value;
 
             if (!nickname || !jobTitle || !bio) {
                 Toastify({
@@ -624,12 +568,45 @@ formData.append('svgColor', svgColor);
                 return;
             }
 
+            if (phone && !/^\+?[1-9]\d{1,14}$/.test(phone)) {
+                Toastify({
+                    text: 'Invalid phone number format (e.g., +1234567890).',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+                return;
+            }
+
+            const isValidUrl = (url) => {
+                if (!url) return true; // Allow empty URLs
+                try {
+                    new URL(url);
+                    return true;
+                } catch {
+                    return false;
+                }
+            };
+
+            for (const [key, url] of Object.entries(socialLinks)) {
+                if (url && !isValidUrl(url)) {
+                    Toastify({
+                        text: `Invalid ${key.charAt(0).toUpperCase() + key.slice(1)} URL.`,
+                        duration: 3000,
+                        style: { background: '#ef4444' }
+                    }).showToast();
+                    return;
+                }
+            }
+
+            formData.append('portfolioName', portfolioName);
             formData.append('nickname', nickname);
             formData.append('jobTitle', jobTitle);
             formData.append('bio', bio);
-            formData.append('isPublic', isPublic);
             formData.append('phone', phone);
+            formData.append('isPublic', isPublic);
             formData.append('socialLinks', JSON.stringify(socialLinks));
+            formData.append('avatarDisplayType', avatarDisplayType);
+            formData.append('svgColor', svgColor);
 
             const avatarFile = document.getElementById('avatar').files[0];
             if (avatarFile) formData.append('avatar', avatarFile);
@@ -642,25 +619,6 @@ formData.append('svgColor', svgColor);
                 if (institution && degree && year) {
                     education.push({ institution, degree, year });
                 }
-                if (phone && !/^\+?[1-9]\d{1,14}$/.test(phone)) {
-    Toastify({
-        text: 'Invalid phone number format.',
-        duration: 3000,
-        style: { background: '#ef4444' }
-    }).showToast();
-    return;
-}
-for (const [key, url] of Object.entries(socialLinks)) {
-    if (url && !isValidUrl(url)) {
-        Toastify({
-            text: `Invalid ${key} URL.`,
-            duration: 3000,
-            style: { background: '#ef4444' }
-        }).showToast();
-        return;
-    }
-}
-
             });
 
             const experience = [];
@@ -693,14 +651,6 @@ for (const [key, url] of Object.entries(socialLinks)) {
             });
 
             const projects = [];
-            const isValidUrl = (url) => {
-                try {
-                    new URL(url);
-                    return true;
-                } catch {
-                    return false;
-                }
-            };
             let hasInvalidUrl = false;
             document.querySelectorAll('#project-fields .dynamic-field').forEach((field, index) => {
                 const title = field.querySelector('[name="title"]').value.trim();
@@ -721,7 +671,7 @@ for (const [key, url] of Object.entries(socialLinks)) {
                 if (hasInvalidUrl) return;
                 if (title && description) {
                     projects.push({ title, description, links });
-                    if (imageFile) formData.append(`projectImages[${index}]`, imageFile);
+                    if (imageFile) formData.append('projectImages', imageFile);
                 }
             });
 
@@ -777,6 +727,18 @@ for (const [key, url] of Object.entries(socialLinks)) {
                     throw new Error(data.error || 'Failed to update profile');
                 }
 
+                if (data.hasTransparency) {
+                    document.getElementById('avatar-suggestion').classList.remove('hidden');
+                    document.getElementById('avatar-suggestion').textContent = 'Image has a transparent background. Recommended: Use "Inside SVG" for a custom shape and color.';
+                    document.getElementById('avatarDisplayType').value = 'svg';
+                    toggleSvgColorField();
+                } else if (avatarFile) {
+                    document.getElementById('avatar-suggestion').classList.remove('hidden');
+                    document.getElementById('avatar-suggestion').textContent = 'Image has a background. Recommended: Use "Normal Image" for best display.';
+                    document.getElementById('avatarDisplayType').value = 'normal';
+                    toggleSvgColorField();
+                }
+
                 Toastify({
                     text: 'Profile updated successfully!',
                     duration: 3000,
@@ -813,28 +775,30 @@ for (const [key, url] of Object.entries(socialLinks)) {
                     throw new Error('Invalid server response');
                 }
                 if (!response.ok) throw new Error(data.error || 'Failed to fetch profile');
-                if (data.hasTransparency) {
-    document.getElementById('avatar-suggestion').classList.remove('hidden');
-    document.getElementById('avatar-suggestion').textContent = 'This image has a transparent background. We recommend using "Inside SVG" for a better look.';
-    document.getElementById('avatarDisplayType').value = 'svg';
-} else {
-    document.getElementById('avatar-suggestion').classList.remove('hidden');
-    document.getElementById('avatar-suggestion').textContent = 'This image has a background. We recommend using "Normal Image" for best results.';
-    document.getElementById('avatarDisplayType').value = 'normal';
-}
 
+                document.getElementById('portfolioName').value = data.profile.portfolioName || 'Portfolio';
+                document.getElementById('portfolio-name').textContent = data.profile.portfolioName || 'Portfolio';
                 document.getElementById('nickname').value = data.profile.nickname || '';
                 document.getElementById('jobTitle').value = data.profile.jobTitle || '';
                 document.getElementById('bio').value = data.profile.bio || '';
-                document.getElementById('isPublic').value = data.profile.isPublic.toString();
                 document.getElementById('phone').value = data.profile.phone || '';
-document.getElementById('social-linkedin').value = data.profile.socialLinks?.linkedin || '';
-document.getElementById('social-behance').value = data.profile.socialLinks?.behance || '';
-document.getElementById('social-github').value = data.profile.socialLinks?.github || '';
-document.getElementById('social-whatsapp').value = data.profile.socialLinks?.whatsapp || '';
-document.getElementById('avatarDisplayType').value = data.profile.avatarDisplayType || 'normal';
-document.getElementById('svgColor').value = data.profile.svgColor || '#000000';
-toggleSvgColorField();
+                document.getElementById('isPublic').value = data.profile.isPublic.toString();
+                document.getElementById('social-linkedin').value = data.profile.socialLinks?.linkedin || '';
+                document.getElementById('social-behance').value = data.profile.socialLinks?.behance || '';
+                document.getElementById('social-github').value = data.profile.socialLinks?.github || '';
+                document.getElementById('social-whatsapp').value = data.profile.socialLinks?.whatsapp || '';
+                document.getElementById('avatarDisplayType').value = data.profile.avatarDisplayType || 'normal';
+                document.getElementById('svgColor').value = data.profile.svgColor || '#000000';
+                toggleSvgColorField();
+
+                if (data.hasTransparency) {
+                    document.getElementById('avatar-suggestion').classList.remove('hidden');
+                    document.getElementById('avatar-suggestion').textContent = 'Current image has a transparent background. Recommended: Use "Inside SVG" for a custom shape and color.';
+                } else if (data.profile.avatar) {
+                    document.getElementById('avatar-suggestion').classList.remove('hidden');
+                    document.getElementById('avatar-suggestion').textContent = 'Current image has a background. Recommended: Use "Normal Image" for best display.';
+                }
+
                 const educationContainer = document.getElementById('education-fields');
                 educationContainer.innerHTML = '';
                 data.profile.education.forEach(edu => {
@@ -891,8 +855,8 @@ toggleSvgColorField();
                         <div class="link-fields">
                             ${project.links.map(link => `
                                 <div class="link-field">
-                                    <input type="text" name="option" placeholder="Link Option" value="${link.option}" class="mb-2">
-                                    <input type="text" name="value" placeholder="Link URL" value="${link.value}" class="mb-2">
+                                    <input type="text" name="option" placeholder="Link Option (e.g., Demo)" value="${link.option}" class="mb-2">
+                                    <input type="url" name="value" placeholder="Link URL (e.g., https://example.com)" value="${link.value}" class="mb-2">
                                     <button type="button" class="remove-link">Remove Link</button>
                                 </div>
                             `).join('')}
@@ -907,8 +871,8 @@ toggleSvgColorField();
                         const newLink = document.createElement('div');
                         newLink.className = 'link-field';
                         newLink.innerHTML = `
-                            <input type="text" name="option" placeholder="Link Option" class="mb-2">
-                            <input type="text" name="value" placeholder="Link URL" class="mb-2">
+                            <input type="text" name="option" placeholder="Link Option (e.g., Demo)" class="mb-2">
+                            <input type="url" name="value" placeholder="Link URL (e.g., https://example.com)" class="mb-2">
                             <button type="button" class="remove-link">Remove Link</button>
                         `;
                         linkContainer.appendChild(newLink);
@@ -935,6 +899,7 @@ toggleSvgColorField();
                     duration: 3000,
                     style: { background: '#ef4444' }
                 }).showToast();
+                window.location.href = '/login.html';
             }
         }
 
@@ -952,6 +917,7 @@ toggleSvgColorField();
                     if (data.isAdmin) {
                         document.getElementById('admin-link').style.display = 'block';
                     }
+                    document.getElementById('portfolio-name').textContent = data.profile.portfolioName || 'Portfolio';
                 } else {
                     localStorage.removeItem('userToken');
                     localStorage.removeItem('refreshToken');
@@ -988,7 +954,7 @@ toggleSvgColorField();
                 `).join('') : '<p class="p-2">No users found.</p>';
             } catch (error) {
                 console.error('Error searching users:', error);
-                document.getElementById('search-results').innerHTML = '<p class="p-2">Error searching users: ' + error.message;
+                document.getElementById('search-results').innerHTML = `<p class="p-2">Error searching users: ${error.message}</p>`;
             }
         }
 
