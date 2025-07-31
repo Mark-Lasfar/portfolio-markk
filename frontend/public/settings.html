@@ -307,6 +307,8 @@
     <div class="container">
         <h1 class="text-xl md:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Profile Settings</h1>
         <form id="profile-form">
+
+            <input type="hidden" name="_csrf" id="csrf-token">
             <div class="mb-4">
                 <label class="block text-gray-900 dark:text-white mb-1 text-sm">Portfolio Name</label>
                 <input type="text" id="portfolioName" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" placeholder="e.g., My Portfolio">
@@ -359,6 +361,14 @@
                     <label class="block text-gray-900 dark:text-white mb-1 text-sm">LinkedIn</label>
                     <input type="url" name="linkedin" id="social-linkedin" placeholder="e.g., https://linkedin.com/in/username" class="mb-2">
                 </div>
+
+                <div class="mb-4">
+    <label class="block text-gray-900 dark:text-white mb-1 text-sm">PDF Generation Method</label>
+    <select id="pdfFormat" name="pdfFormat" class="w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500">
+        <option value="jspdf">jsPDF (Basic PDF)</option>
+        <option value="canva">Canva (Interactive Design)</option>
+    </select>
+</div>
                 <div class="dynamic-field">
                     <label class="block text-gray-900 dark:text-white mb-1 text-sm">Behance</label>
                     <input type="url" name="behance" id="social-behance" placeholder="e.g., https://behance.net/username" class="mb-2">
@@ -540,10 +550,20 @@
             }
         });
 
+        async function getCsrfToken() {
+    const response = await fetch(`${API_URL}/api/csrf-token`, {
+        headers: { 'Authorization': `Bearer ${userToken}` }
+    });
+    const data = await response.json();
+    return data.csrfToken;
+}
+
         document.getElementById('profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+
             const formData = new FormData();
             const loader = document.getElementById('loader');
+            formData.append('_csrf', await getCsrfToken());
             const portfolioName = document.getElementById('portfolioName').value.trim();
             const nickname = document.getElementById('nickname').value.trim();
             const jobTitle = document.getElementById('jobTitle').value.trim();
@@ -631,6 +651,23 @@
                 }
             });
 
+            document.querySelectorAll('#education-fields .dynamic-field').forEach(field => {
+    const institution = field.querySelector('[name="institution"]').value.trim();
+    const degree = field.querySelector('[name="degree"]').value.trim();
+    const year = field.querySelector('[name="year"]').value.trim();
+    if (institution || degree || year) { // لو أي حقل مش فاضي، لازم الكل يكون مليان
+        if (!institution || !degree || !year) {
+            Toastify({
+                text: 'All education fields (Institution, Degree, Year) are required.',
+                duration: 3000,
+                style: { background: '#ef4444' }
+            }).showToast();
+            return;
+        }
+        education.push({ institution, degree, year });
+    }
+});
+
             const certificates = [];
             document.querySelectorAll('#certificate-fields .dynamic-field').forEach(field => {
                 const name = field.querySelector('[name="name"]').value.trim();
@@ -709,11 +746,14 @@
             loader.style.display = 'flex';
 
             try {
-                const response = await fetch(`${API_URL}/api/profile`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${userToken}` },
-                    body: formData
-                });
+const response = await fetch(`${API_URL}/api/profile`, {
+    method: 'PUT',
+    headers: {
+        'Authorization': `Bearer ${userToken}`,
+        'X-CSRF-Token': document.getElementById('csrf-token').value
+    },
+    body: formData
+});
 
                 const text = await response.text();
                 let data;

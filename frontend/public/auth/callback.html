@@ -59,9 +59,10 @@
     <script src="/assets/js/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
+            const refreshToken = urlParams.get('refreshToken');
             const provider = urlParams.get('provider');
             const error = urlParams.get('error');
 
@@ -70,6 +71,7 @@
             document.documentElement.setAttribute('data-theme', savedTheme);
 
             if (error) {
+                console.error('Authentication error from URL:', decodeURIComponent(error));
                 document.querySelector('.loader').classList.add('hidden');
                 document.getElementById('error-message').textContent = decodeURIComponent(error);
                 document.getElementById('error-message').classList.remove('hidden');
@@ -78,49 +80,50 @@
                     duration: 3000,
                     style: { background: '#ef4444' }
                 }).showToast();
-                setTimeout(() => window.location.href = '/login.html', 3000);
+                setTimeout(() => window.location.href = `${window.ENV.WEB_URL}/login.html`, 3000);
                 return;
             }
 
             if (token && provider) {
                 localStorage.setItem('userToken', token);
-                // Fetch refresh token if needed
-                fetch(`${window.ENV.API_URL}/api/refresh-token`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.refreshToken) {
-                        localStorage.setItem('refreshToken', data.refreshToken);
+                localStorage.setItem('refreshToken', refreshToken);
+                try {
+                    const response = await fetch(`${window.ENV.API_URL}/api/verify-token`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Token verification failed');
                     }
                     Toastify({
                         text: `Logged in with ${provider.charAt(0).toUpperCase() + provider.slice(1)}!`,
                         duration: 3000,
                         style: { background: '#10b981' }
                     }).showToast();
-                    setTimeout(() => window.location.href = '/profile/me', 1000);
-                })
-                .catch(error => {
-                    console.error('Error fetching refresh token:', error);
+                    setTimeout(() => window.location.href = `${window.ENV.WEB_URL}/profile/me`, 1000);
+                } catch (error) {
+                    console.error('Error verifying token:', error.message);
+                    document.querySelector('.loader').classList.add('hidden');
+                    document.getElementById('error-message').textContent = `Authentication error: ${error.message}`;
+                    document.getElementById('error-message').classList.remove('hidden');
                     Toastify({
-                        text: 'Authentication error',
+                        text: `Authentication error: ${error.message}`,
                         duration: 3000,
                         style: { background: '#ef4444' }
                     }).showToast();
-                    setTimeout(() => window.location.href = '/login.html', 3000);
-                });
+                    setTimeout(() => window.location.href = `${window.ENV.WEB_URL}/login.html`, 3000);
+                }
             } else {
+                console.error('No token or provider provided in URL');
                 document.querySelector('.loader').classList.add('hidden');
-                document.getElementById('error-message').textContent = 'Authentication failed: No token provided';
+                document.getElementById('error-message').textContent = 'Authentication failed: No token or provider provided';
                 document.getElementById('error-message').classList.remove('hidden');
                 Toastify({
-                    text: 'Authentication failed: No token provided',
+                    text: 'Authentication failed: No token or provider provided',
                     duration: 3000,
                     style: { background: '#ef4444' }
                 }).showToast();
-                setTimeout(() => window.location.href = '/login.html', 3000);
+                setTimeout(() => window.location.href = `${window.ENV.WEB_URL}/login.html`, 3000);
             }
         });
     </script>

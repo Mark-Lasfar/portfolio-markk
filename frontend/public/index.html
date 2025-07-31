@@ -358,6 +358,12 @@
         width: 32px; /* تصغير الشعار على الشاشات الصغيرة */
         height: 32px;
     }
+.nav__toggle {
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-color);
+        z-index: 1001;
+    }
   .home {
     min-height: 100vh; /* خليها تملى الشاشة */
     display: flex;
@@ -420,15 +426,18 @@
 }
   
 
-  .nav__menu {
+.nav__menu {
         position: fixed;
-        top: 60px;
+        top: 3rem;
         right: -100%;
-        width: 80%;
-        height: 100%;
+        width: 70%;
+        max-width: 300px;
+        height: calc(100vh - 3rem);
         background-color: var(--primary-color);
-        transition: right 0.3s;
+        transition: right 0.3s ease;
         z-index: 1000;
+        padding: 1rem;
+        box-shadow: -2px 0 6px rgba(0, 0, 0, 0.2);
     }
     .nav__menu.show {
         right: 0;
@@ -532,6 +541,25 @@
     transform: scale(1.1); /* تكبير طفيف عند التمرير لتحسين التفاعل */
 }
 
+.footer__links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.footer__links .footer__icon {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: color 0.3s;
+}
+.footer__links .footer__icon:hover {
+    color: var(--first-color);
+}
+
 
     </style>
 </head>
@@ -611,7 +639,7 @@
             <div class="home__buttons">
                 <a href="tel:+201212444617" class="button">Contact</a>
 <a href="/assets/ibrahim.pdf" class="button" id="downloadCv" download>Download CV</a>
-                <a href="assets/app/mgzon.apk" class="button" download>Download MGZon App</a>
+                <a href="https://github.com/Mark-Lasfar/portfolio-markk/raw/refs/heads/main/mgzon.apk" class="button" download>Download MGZon App</a>
 
 
             </div>
@@ -839,6 +867,11 @@
             <a href="https://www.instagram.com/explore/tags/mark/" class="footer__icon"><i class='bx bxl-instagram'></i></a>
             <a href="https://x.com/marklasfar" class="footer__icon"><i class='bx bxl-twitter'></i></a>
         </div>
+        <div class="footer__links">
+    <a href="/privacy" class="footer__icon"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+    <a href="/terms" class="footer__icon"><i class="fas fa-file-contract"></i> Terms of Service</a>
+    <a href="/data-deletion" class="footer__icon"><i class="fas fa-trash-alt"></i> Data Deletion</a>
+</div>
         <div class="containerDown">
             <div class="last">
                 <div class="head">Total Website Visits</div>
@@ -1351,7 +1384,8 @@ document.getElementById('radix-attach').addEventListener('click', () => {
                 messageDiv.className = 'chat-message';
                 messageDiv.innerHTML = `
                     <p><strong>You:</strong> Uploaded file: ${file.name}</p>
-                    <p><strong>Assistant:</strong> ${data.message} <a href="${data.message.split(': ')[1]}" target="_blank">View File</a></p>
+                    <p><strong>You:</strong> Uploaded file: ${file.name}</p>
+        <p><strong>Assistant:</strong> ${data.message || 'File uploaded successfully.'} ${data.message.includes('http') ? `<a href="${data.message.split(': ')[1]}" target="_blank">View File</a>` : ''}</p>
                 `;
                 document.getElementById('chat-history').appendChild(messageDiv);
                 document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollTop;
@@ -1406,6 +1440,15 @@ document.getElementById('radix-attach').addEventListener('click', () => {
                 searchResults.classList.add('hidden');
             }
         });
+
+document.getElementById('nav-toggle').addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('Toggle clicked!');
+    const navMenu = document.getElementById('nav-menu');
+    console.log('Menu element:', navMenu);
+    navMenu.classList.toggle('show');
+    console.log('Menu classList:', navMenu.classList);
+});
 
 </script>
 </body>

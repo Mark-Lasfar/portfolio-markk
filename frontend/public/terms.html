@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --first-color: #007bff;
+            --primary-color: #fff;
+            --text-color: #333;
+            --background-color: #f9fafb;
+            --border-color: #d1d5db;
+        }
+        [data-theme="dark"] {
+            --first-color: #66b0ff;
+            --primary-color: #1f2937;
+            --text-color: #f3f4f6;
+            --background-color: #111827;
+            --border-color: #6b7280;
+        }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(to bottom, var(--background-color), var(--primary-color));
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: var(--first-color);
+        }
+        a {
+            color: var(--first-color);
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-6">Terms of Service</h1>
+        <p class="mb-4">Last updated: July 30, 2025</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Introduction</h2>
+        <p class="mb-4">Welcome to Portfolio App ("we", "our", "us"). These Terms of Service ("Terms") govern your use of our website (<a href="https://mark-elasfar.web.app">mark-elasfar.web.app</a>) and services. By accessing or using our services, you agree to be bound by these Terms.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Use of Our Services</h2>
+        <p class="mb-4">You agree to:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Use our services in compliance with applicable laws and regulations.</li>
+            <li>Not engage in any activity that disrupts or interferes with our services.</li>
+            <li>Not attempt to gain unauthorized access to our systems or user accounts.</li>
+        </ul>
+        
+        <h2 class="text-xl font-semibold mb-3">User Accounts</h2>
+        <p class="mb-4">To access certain features, you may need to create an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Content</h2>
+        <p class="mb-4">You retain ownership of any content you submit to our platform (e.g., profile information). By submitting content, you grant us a non-exclusive, worldwide, royalty-free license to use, display, and store your content to provide our services.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Termination</h2>
+        <p class="mb-4">We reserve the right to suspend or terminate your account if you violate these Terms or engage in prohibited activities.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Limitation of Liability</h2>
+        <p class="mb-4">Our services are provided "as is" without warranties of any kind. We are not liable for any damages arising from your use of our services, except as required by law.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Contact Us</h2>
+        <p class="mb-4">If you have any questions about these Terms, please contact us at:</p>
+        <p class="mb-4">Email: <a href="mailto:marklasfar@gmail.com">marklasfar@gmail.com</a></p>
+        <p>Address: 123 Main Street, Cairo, Cairo Governorate, 12345, Egypt</p>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+    </script>
+</body>
+</html>

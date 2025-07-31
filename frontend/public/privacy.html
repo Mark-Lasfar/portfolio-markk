@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --first-color: #007bff;
+            --primary-color: #fff;
+            --text-color: #333;
+            --background-color: #f9fafb;
+            --border-color: #d1d5db;
+        }
+        [data-theme="dark"] {
+            --first-color: #66b0ff;
+            --primary-color: #1f2937;
+            --text-color: #f3f4f6;
+            --background-color: #111827;
+            --border-color: #6b7280;
+        }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(to bottom, var(--background-color), var(--primary-color));
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: var(--first-color);
+        }
+        a {
+            color: var(--first-color);
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-6">Privacy Policy</h1>
+        <p class="mb-4">Last updated: July 30, 2025</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Introduction</h2>
+        <p class="mb-4">Welcome to Portfolio App ("we", "our", "us"). We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website (<a href="https://mark-elasfar.web.app">mark-elasfar.web.app</a>) or our services.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Information We Collect</h2>
+        <p class="mb-4">We may collect the following types of information:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li><strong>Personal Information:</strong> When you sign up or log in using social media accounts (e.g., Google, Facebook, GitHub), we may collect your name, email address, and profile information provided by these services.</li>
+            <li><strong>Usage Data:</strong> We collect information about how you interact with our website, such as pages visited, time spent, and IP address.</li>
+            <li><strong>Cookies:</strong> We use cookies to enhance your experience, such as remembering your theme preference (light/dark mode).</li>
+        </ul>
+        
+        <h2 class="text-xl font-semibold mb-3">How We Use Your Information</h2>
+        <p class="mb-4">We use your information to:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>Provide and maintain our services, including user authentication and profile management.</li>
+            <li>Improve our website and personalize your experience.</li>
+            <li>Communicate with you, including responding to inquiries.</li>
+            <li>Ensure the security of our platform.</li>
+        </ul>
+        
+        <h2 class="text-xl font-semibold mb-3">Sharing Your Information</h2>
+        <p class="mb-4">We do not sell or share your personal information with third parties except:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>With service providers (e.g., Firebase, Vercel) who assist in operating our website.</li>
+            <li>When required by law or to protect our rights.</li>
+        </ul>
+        
+        <h2 class="text-xl font-semibold mb-3">Data Retention and Deletion</h2>
+        <p class="mb-4">We retain your personal information only for as long as necessary to provide our services. You can request deletion of your data by visiting our <a href="/data-deletion">Data Deletion Instructions</a> page.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Your Rights</h2>
+        <p class="mb-4">Depending on your location, you may have rights under data protection laws, such as GDPR, including the right to access, correct, or delete your personal data. Contact us at <a href="mailto:marklasfar@gmail.com">marklasfar@gmail.com</a> to exercise these rights.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Contact Us</h2>
+        <p class="mb-4">If you have any questions about this Privacy Policy, please contact us at:</p>
+        <p class="mb-4">Email: <a href="mailto:marklasfar@gmail.com">marklasfar@gmail.com</a></p>
+        <p>Address: 123 Main Street, Cairo, Cairo Governorate, 12345, Egypt</p>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+    </script>
+</body>
+</html>

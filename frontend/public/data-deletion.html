@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Deletion Instructions - Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --first-color: #007bff;
+            --primary-color: #fff;
+            --text-color: #333;
+            --background-color: #f9fafb;
+            --border-color: #d1d5db;
+        }
+        [data-theme="dark"] {
+            --first-color: #66b0ff;
+            --primary-color: #1f2937;
+            --text-color: #f3f4f6;
+            --background-color: #111827;
+            --border-color: #6b7280;
+        }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(to bottom, var(--background-color), var(--primary-color));
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: var(--first-color);
+        }
+        a {
+            color: var(--first-color);
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-6">Data Deletion Instructions</h1>
+        <p class="mb-4">Last updated: July 30, 2025</p>
+        
+        <h2 class="text-xl font-semibold mb-3">Introduction</h2>
+        <p class="mb-4">At Portfolio App, we respect your right to control your personal data. If you wish to delete your data from our platform, please follow the instructions below.</p>
+        
+        <h2 class="text-xl font-semibold mb-3">How to Request Data Deletion</h2>
+        <p class="mb-4">To request the deletion of your personal data (including your account, profile information, and any associated data), please follow these steps:</p>
+        <ol class="list-decimal pl-6 mb-4">
+            <li>Send an email to <a href="mailto:marklasfar@gmail.com">marklasfar@gmail.com</a> from the email address associated with your account.</li>
+            <li>Include the subject line: "Data Deletion Request".</li>
+            <li>In the email, provide your full name and any relevant account details (e.g., email address used for login).</li>
+            <li>We will verify your identity and process your request within 30 days, as required by applicable data protection laws.</li>
+        </ol>
+        
+        <h2 class="text-xl font-semibold mb-3">What Happens After Your Request</h2>
+        <p class="mb-4">Upon receiving your request:</p>
+        <ul class="list-disc pl-6 mb-4">
+            <li>We will delete all personal data associated with your account, including profile information and authentication tokens.</li>
+            <li>We will notify you via email once the deletion is complete.</li>
+            <li>Note that some data may be retained if required by law or for legitimate business purposes (e.g., fraud prevention).</li>
+        </ul>
+        
+        <h2 class="text-xl font-semibold mb-3">Facebook Login Users</h2>
+        <p class="mb-4">If you signed up using Facebook Login, you can also remove our app's access to your Facebook account:</p>
+        <ol class="list-decimal pl-6 mb-4">
+            <li>Log in to your Facebook account.</li>
+            <li>Go to Settings > Apps and Websites.</li>
+            <li>Find "Portfolio App" and click "Remove".</li>
+            <li>Follow the prompts to revoke our access to your data.</li>
+        </ol>
+        
+        <h2 class="text-xl font-semibold mb-3">Contact Us</h2>
+        <p class="mb-4">If you have any questions about data deletion or this process, please contact us at:</p>
+        <p class="mb-4">Email: <a href="mailto:marklasfar@gmail.com">marklasfar@gmail.com</a></p>
+        <p>Address: 123 Main Street, Cairo, Cairo Governorate, 12345, Egypt</p>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        });
+    </script>
+</body>
+</html>
