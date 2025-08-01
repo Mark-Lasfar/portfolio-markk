@@ -7,65 +7,63 @@
             "**/.*",
             "**/node_modules/**"
         ],
-"rewrites": [
-    {
-        "source": "/admin",
-        "destination": "/admin/index.html"
-    },
-    {
-        "source": "/profile/{nickname}",
-        "destination": "/profile.html"
-    },
-    {
-        "source": "/profile/me",
-        "destination": "/profile.html"
-    },
-    {
-    "source": "/search",
-    "destination": "/search.html"
-}
-    ,
-    
-    {
-        "source": "/settings",
-        "destination": "/settings.html"
-    },
-    {
-        "source": "/admin/comments",
-        "destination": "/admin/comments.html"
-    },
-    {
-        "source": "/admin/users",
-        "destination": "/admin/users.html"
-    },
-    {
-        "source": "/login",
-        "destination": "/login.html"
-    },
-    {
-        "source": "/register",
-        "destination": "/register.html"
-    },
-    {
-        "source": "/auth/**",
-        "destination": "/auth/callback.html"
-    },
-    {
-        "source": "/privacy",
-        "destination": "/privacy.html"
-    },
-    {
-        "source": "/terms",
-        "destination": "/terms.html"
-    },
-    {
-        "source": "/data-deletion",
-        "destination": "/data-deletion.html"
-    },
-    {
-        "source": "**",
-        "destination": "/index.html"
-    }
-]
+        "rewrites": [
+            {
+                "source": "/admin",
+                "destination": "/admin/index.html"
+            },
+            {
+                "source": "/profile/:nickname",
+                "destination": "/profile.html"
+            },
+            {
+                "source": "/profile/me",
+                "destination": "/profile.html"
+            },
+            {
+                "source": "/search",
+                "destination": "/search.html"
+            },
+            {
+                "source": "/settings",
+                "destination": "/settings.html"
+            },
+            {
+                "source": "/admin/comments",
+                "destination": "/admin/comments.html"
+            },
+            {
+                "source": "/admin/users",
+                "destination": "/admin/users.html"
+            },
+            {
+                "source": "/login",
+                "destination": "/login.html"
+            },
+            {
+                "source": "/register",
+                "destination": "/register.html"
+            },
+            {
+                "source": "/auth/**",
+                "destination": "/auth/callback.html"
+            },
+            {
+                "source": "/privacy",
+                "destination": "/privacy.html"
+            },
+            {
+                "source": "/terms",
+                "destination": "/terms.html"
+            },
+            {
+                "source": "/data-deletion",
+                "destination": "/data-deletion.html"
+            },
+            {
+                "source": "/**",
+                "destination": "/index.html"
+            }
+        ]
     }
 }

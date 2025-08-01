@@ -561,135 +561,146 @@
             }
         }
 
-        async function loadProfile() {
-            const nickname = window.location.pathname.split('/').pop() || 'me';
-            if (userToken && !(await window.ENV.verifyToken(userToken))) {
-                localStorage.removeItem('userToken');
-                localStorage.removeItem('refreshToken');
-                Toastify({
-                    text: 'Please login to view your profile',
-                    duration: 3000,
-                    style: { background: '#ef4444' }
-                }).showToast();
-                window.location.href = '/login.html?reason=Please login to view your profile';
+async function loadProfile() {
+    let nickname = window.location.pathname.split('/').pop() || 'me';
+    if (nickname === 'me' && !userToken) {
+        Toastify({
+            text: 'Please login to view your profile',
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+        window.location.href = '/login.html?reason=Please login to view your profile';
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/profile/${encodeURIComponent(nickname)}`, {
+            headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            if (response.status === 403 && errorData.loginRequired) {
+                document.getElementById('profile-nickname').innerHTML = `
+                    <p class="error">This profile is private. Please <a href="/login.html?reason=private_profile" class="text-blue-500 hover:underline">login</a> to view.</p>
+                `;
+                document.querySelectorAll('.container:not(#home)').forEach(container => container.style.display = 'none');
                 return;
             }
-            try {
-                const response = await fetch(`${API_URL}/api/profile/${nickname}`, {
-                    headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    if (response.status === 403 && errorData.loginRequired) {
-                        document.getElementById('profile-nickname').innerHTML = `
-                            <p class="error">This profile is private. Please <a href="/login.html?reason=private_profile" class="text-blue-500 hover:underline">login</a> to view.</p>
-                        `;
-                        document.querySelectorAll('.container:not(#home)').forEach(container => container.style.display = 'none');
-                        return;
-                    }
-                    throw new Error(errorData.error || 'Failed to fetch profile');
-                }
-
-                
-                const data = await response.json();
-                document.getElementById('portfolio-name').textContent = data.profile.portfolioName?.trim() || data.profile.nickname || 'Portfolio';
-                document.getElementById('profile-nickname').textContent = data.profile.nickname || data.username;
-                document.getElementById('profile-jobTitle').textContent = data.profile.jobTitle || 'Not specified';
-                document.getElementById('profile-bio').textContent = data.profile.bio || 'Not specified';
-                const avatarContainer = document.getElementById('avatar-container');
-                const avatarUrl = data.profile.avatar || '/assets/img/default-avatar.png';
-                const avatarDisplayType = data.profile.avatarDisplayType || 'normal';
-                const svgColor = data.profile.svgColor || '#000000';
-                avatarContainer.innerHTML = avatarDisplayType === 'svg' ? `
-                    <svg class="home__blob" viewBox="0 0 479 467" xmlns="http://www.w3.org/2000/svg">
-                        <mask id="mask0" mask-type="alpha">
-                            <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z"/>
-                        </mask>
-                        <g mask="url(#mask0)">
-                            <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z" fill="${svgColor}"/>
-                            <image class="home__blob-img" x="50" y="60" href="${avatarUrl}" alt="Profile Image"/>
-                        </g>
-                    </svg>
-                ` : `
-                    <img src="${avatarUrl}" alt="Profile Image" class="w-24 h-24 object-cover rounded-full mx-auto">
-                `;
-                document.getElementById('contact-phone').href = `tel:${data.profile.phone || ''}`;
-                const socialLinksContainer = document.getElementById('social-links');
-                const socialLinks = data.profile.socialLinks || {};
-                const socialIcons = {
-                    linkedin: 'bxl-linkedin',
-                    behance: 'bxl-behance',
-                    github: 'bxl-github',
-                    whatsapp: 'bxl-whatsapp'
-                };
-                socialLinksContainer.innerHTML = Object.entries(socialLinks)
-                    .filter(([_, url]) => url?.trim())
-                    .map(([key, url]) => `
-                        <a href="${url}" class="home__social-icon" target="_blank">
-                            <i class='bx ${socialIcons[key]}'></i>
-                        </a>
-                    `).join('');
-                document.getElementById('footer-username').textContent = data.profile.nickname || data.username;
-                if (!userToken) {
-                    document.getElementById('profile-nickname').innerHTML += `
-                        <p class="text-gray-700 dark:text-gray-300 mt-4">
-                            <a href="/login.html" class="text-blue-500 hover:underline">Login</a> to access more features.
-                        </p>
-                    `;
-                }
-                const educationContainer = document.getElementById('profile-education');
-                educationContainer.innerHTML = data.profile.education.length ? data.profile.education.map(edu => `
-                    <p class="about__text">${edu.degree} at ${edu.institution} (${edu.year})</p>
-                `).join('') : '<p class="about__text">No education details provided.</p>';
-                const experienceContainer = document.getElementById('profile-experience');
-                experienceContainer.innerHTML = data.profile.experience.length ? data.profile.experience.map(exp => `
-                    <p class="about__text">${exp.role} at ${exp.company} (${exp.duration})</p>
-                `).join('') : '<p class="about__text">No experience details provided.</p>';
-                const certificatesContainer = document.getElementById('profile-certificates');
-                certificatesContainer.innerHTML = data.profile.certificates.length ? data.profile.certificates.map(cert => `
-                    <p class="about__text">${cert.name} by ${cert.issuer} (${cert.year})</p>
-                `).join('') : '<p class="about__text">No certificates provided.</p>';
-                const interestsContainer = document.getElementById('profile-interests');
-                interestsContainer.innerHTML = data.profile.interests.length ? data.profile.interests.map(interest => `
-                    <p class="about__text">${interest}</p>
-                `).join('') : '<p class="about__text">No interests provided.</p>';
-                const skillsContainer = document.getElementById('profile-skills');
-                skillsContainer.innerHTML = data.profile.skills.length ? data.profile.skills.map(skill => `
-                    <div class="skills__data">
-                        <div class="skills__names">
-                            <span class="skills__name">${skill.name}</span>
-                        </div>
-                        <div class="skills__bar" style="width: ${skill.percentage}%"></div>
-                        <div><span class="skills__percentage">${skill.percentage}%</span></div>
-                    </div>
-                `).join('') : '<p>No skills provided.</p>';
-                const projectsContainer = document.getElementById('profile-projects');
-                projectsContainer.innerHTML = data.profile.projects.length ? data.profile.projects.map(project => `
-                    <div class="single-portfolio-content">
-                        <img src="${project.image || '/assets/img/default-project.png'}" alt="${project.title}" class="work__img">
-                        <div class="work__content">
-                            <h3>${project.title}</h3>
-                            <p>${project.description}</p>
-                            <div class="select-container">
-                                <select name="links" onchange="if(this.value) window.open(this.value, '_blank');">
-                                    <option value="">Choose an option</option>
-                                    ${project.links.map(link => `<option value="${link.value}">${link.option}</option>`).join('')}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                `).join('') : '<p>No projects provided.</p>';
-                document.getElementById('download-cv').href = `${API_URL}/api/profile/pdf/${nickname}`;
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                Toastify({
-                    text: `Error loading profile: ${error.message}`,
-                    duration: 3000,
-                    style: { background: '#ef4444' }
-                }).showToast();
-            }
+            throw new Error(errorData.error || 'Failed to fetch profile');
         }
 
+        const data = await response.json();
+        document.title = `${data.profile.nickname || data.username}'s Profile`;
+        document.getElementById('portfolio-name').textContent = data.profile.portfolioName?.trim() || data.profile.nickname || 'Portfolio';
+        document.getElementById('profile-nickname').textContent = data.profile.nickname || data.username;
+        document.getElementById('profile-jobTitle').textContent = data.profile.jobTitle || 'Not specified';
+        document.getElementById('profile-bio').textContent = data.profile.bio || 'Not specified';
+        const avatarContainer = document.getElementById('avatar-container');
+        const avatarUrl = data.profile.avatar || '/assets/img/default-avatar.png';
+        const avatarDisplayType = data.profile.avatarDisplayType || 'normal';
+        const svgColor = data.profile.svgColor || '#000000';
+        avatarContainer.innerHTML = avatarDisplayType === 'svg' ? `
+            <svg class="home__blob" viewBox="0 0 479 467" xmlns="http://www.w3.org/2000/svg">
+                <mask id="mask0" mask-type="alpha">
+                    <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z"/>
+                </mask>
+                <g mask="url(#mask0)">
+                    <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z" fill="${svgColor}"/>
+                    <image class="home__blob-img" x="50" y="60" href="${avatarUrl}" alt="Profile Image"/>
+                </g>
+            </svg>
+        ` : `
+            <img src="${avatarUrl}" alt="Profile Image" class="w-24 h-24 object-cover rounded-full mx-auto">
+        `;
+        document.getElementById('contact-phone').href = `tel:${data.profile.phone || ''}`;
+        document.getElementById('download-cv').href = `${API_URL}/api/profile/pdf/${encodeURIComponent(nickname)}`;
+        document.getElementById('create-canva').href = `${API_URL}/api/profile/canva/${encodeURIComponent(nickname)}`;
+        const socialLinksContainer = document.getElementById('social-links');
+        const socialLinks = data.profile.socialLinks || {};
+        const socialIcons = {
+            linkedin: 'bxl-linkedin',
+            behance: 'bxl-behance',
+            github: 'bxl-github',
+            whatsapp: 'bxl-whatsapp'
+        };
+        socialLinksContainer.innerHTML = Object.entries(socialLinks)
+            .filter(([_, url]) => url?.trim())
+            .map(([key, url]) => `
+                <a href="${url}" class="home__social-icon" target="_blank">
+                    <i class='bx ${socialIcons[key]}'></i>
+                </a>
+            `).join('');
+        document.getElementById('footer-username').textContent = data.profile.nickname || data.username;
+
+        // تحديث الأقسام
+        const educationContainer = document.getElementById('profile-education');
+        educationContainer.innerHTML = data.profile.education.length ? data.profile.education.map(edu => `
+            <p class="about__text">${edu.degree} at ${edu.institution} (${edu.year})</p>
+        `).join('') : '<p class="about__text">No education details provided.</p>';
+
+        const experienceContainer = document.getElementById('profile-experience');
+        experienceContainer.innerHTML = data.profile.experience.length ? data.profile.experience.map(exp => `
+            <p class="about__text">${exp.role} at ${exp.company} (${exp.duration})</p>
+        `).join('') : '<p class="about__text">No experience details provided.</p>';
+
+        const certificatesContainer = document.getElementById('profile-certificates');
+        certificatesContainer.innerHTML = data.profile.certificates.length ? data.profile.certificates.map(cert => `
+            <p class="about__text">${cert.name} by ${cert.issuer} (${cert.year})</p>
+        `).join('') : '<p class="about__text">No certificates provided.</p>';
+
+        const interestsContainer = document.getElementById('profile-interests');
+        interestsContainer.innerHTML = data.profile.interests.length ? data.profile.interests.map(interest => `
+            <p class="about__text">${interest}</p>
+        `).join('') : '<p class="about__text">No interests provided.</p>';
+
+        const skillsContainer = document.getElementById('profile-skills');
+        skillsContainer.innerHTML = data.profile.skills.length ? data.profile.skills.map(skill => `
+            <div class="skills__data">
+                <div class="skills__names">
+                    <span class="skills__name">${skill.name}</span>
+                </div>
+                <div class="skills__bar" style="width: ${skill.percentage}%"></div>
+                <div><span class="skills__percentage">${skill.percentage}%</span></div>
+            </div>
+        `).join('') : '<p>No skills provided.</p>';
+
+        const projectsContainer = document.getElementById('profile-projects');
+        projectsContainer.innerHTML = data.profile.projects.length ? data.profile.projects.map(project => `
+            <div class="single-portfolio-content">
+                <img src="${project.image || '/assets/img/default-project.png'}" alt="${project.title}" class="work__img">
+                <div class="work__content">
+                    <h3>${project.title}</h3>
+                    <p>${project.description}</p>
+                    <div class="select-container">
+                        <select name="links" onchange="if(this.value) window.open(this.value, '_blank');">
+                            <option value="">Choose an option</option>
+                            ${project.links.map(link => `<option value="${link.value}">${link.option}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `).join('') : '<p>No projects provided.</p>';
+
+        if (!userToken) {
+            document.getElementById('profile-nickname').innerHTML += `
+                <p class="text-gray-700 dark:text-gray-300 mt-4">
+                    <a href="/login.html" class="text-blue-500 hover:underline">Login</a> to access more features.
+                </p>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        Toastify({
+            text: `Error loading profile: ${error.message}`,
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+        document.getElementById('profile-nickname').innerHTML = `
+            <p class="error">Failed to load profile. Please try again later.</p>
+        `;
+        document.querySelectorAll('.container:not(#home)').forEach(container => container.style.display = 'none');
+    }
+}
         async function loadInteractions() {
             const interactionsContainer = document.getElementById('profile-interactions');
             if (!userToken) {
