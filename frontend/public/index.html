@@ -969,24 +969,29 @@ window.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('logout-link').addEventListener('click', async (e) => {
     e.preventDefault();
-    const userToken = localStorage.getItem('userToken');
-    const refreshToken = localStorage.getItem('refreshToken');
     try {
         await fetch(`${API_URL}/api/logout`, {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${userToken}`,
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userToken}`
+                'X-CSRF-Token': document.getElementById('csrf-token').value
             },
-            body: JSON.stringify({ refreshToken })
+            body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') })
         });
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('refreshToken');
+        userToken = null;
+        updateNav();
+        window.location.href = '/';
     } catch (error) {
-        console.error('Logout error:', error);
+        console.error('Logout failed:', error);
+        Toastify({
+            text: 'Error during logout',
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
     }
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('refreshToken');
-    await updateNav();
-    window.location.href = '/';
 });
 
 function playMusic() {

@@ -21,6 +21,12 @@
         "destination": "/profile.html"
     },
     {
+    "source": "/search",
+    "destination": "/search.html"
+}
+    ,
+    
+    {
         "source": "/settings",
         "destination": "/settings.html"
     },

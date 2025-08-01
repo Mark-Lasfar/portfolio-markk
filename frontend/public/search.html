@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/assets/js/config.js"></script>
+    <style>
+        :root {
+            --first-color: #1d4ed8;
+            --second-color: #4b5563;
+            --primary-color: #fff;
+            --primary-color-2: #f3f4f6;
+            --container-border: #d1d5db;
+            --text-color: #1f2937;
+            --background-color: #f9fafb;
+            --border-color: #d1d5db;
+            --input-bg: #fff;
+        }
+        [data-theme="dark"] {
+            --first-color: #3b82f6;
+            --second-color: #9ca3af;
+            --primary-color: #1f2937;
+            --primary-color-2: #374151;
+            --container-border: #4b5563;
+            --text-color: #f3f4f6;
+            --background-color: #111827;
+            --border-color: #6b7280;
+            --input-bg: #374151;
+        }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .l-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav__logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .nav__logo img {
+            width: 1.75rem;
+            height: 1.75rem;
+            margin-right: 0.5rem;
+            object-fit: contain;
+        }
+        .nav__list {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .nav__link {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .nav__link:hover {
+            background-color: var(--first-color);
+            color: #fff;
+        }
+        #theme-toggle img {
+            width: 1.1rem;
+            height: 1.1rem;
+            vertical-align: middle;
+            transition: transform 0.3s;
+        }
+        #theme-toggle:hover img {
+            transform: rotate(15deg);
+        }
+        #search-input {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            width: 100%;
+            max-width: 300px;
+            font-size: 0.9rem;
+        }
+        #search-results {
+            max-height: 400px;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            background: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 5rem;
+        }
+        .user-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--primary-color);
+            border: 1px solid var(--container-border);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: background-color 0.3s, transform 0.2s;
+            cursor: pointer;
+        }
+        .user-card:hover {
+            background-color: var(--primary-color-2);
+            transform: translateY(-2px);
+        }
+        .user-card img {
+            width: 4rem;
+            height: 4rem;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+        .user-info h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .user-info p {
+            font-size: 0.9rem;
+            color: var(--second-color);
+            margin-bottom: 0.25rem;
+        }
+        .user-info .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .user-info .skills span {
+            background-color: var(--first-color);
+            color: #fff;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+        }
+        .download-cv {
+            padding: 0.5rem 1rem;
+            background-color: var(--first-color);
+            color: #fff;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        .download-cv:hover {
+            background-color: #2563eb;
+        }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--second-color);
+        }
+        @media screen and (max-width: 768px) {
+            #search-input {
+                max-width: 100%;
+            }
+            #search-results {
+                max-width: 100%;
+                margin: 4rem 1rem 1rem;
+            }
+            .user-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .user-card img {
+                margin-bottom: 1rem;
+            }
+            .download-cv {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        @media screen and (max-width: 480px) {
+            .user-info h3 {
+                font-size: 1.1rem;
+            }
+            .user-info p {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <header class="l-header">
+        <nav class="nav">
+            <a href="/" class="nav__logo"><img src="/assets/img/logo.svg" alt="Portfolio Logo"> Portfolio</a>
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <input type="text" id="search-input" placeholder="Search users..." class="p-2 rounded-lg border border-gray-300 dark:border-gray-600">
+                        <div id="search-results" class="hidden"></div>
+                    </li>
+                    <li class="nav__item"><a href="/" class="nav__link">Home</a></li>
+                    <li class="nav__item"><a href="/profile/me" class="nav__link" id="profile-link" style="display: none;">Profile</a></li>
+                    <li class="nav__item"><a href="/settings.html" class="nav__link">Settings</a></li>
+                    <li class="nav__item"><a href="/admin" class="nav__link" id="admin-link" style="display: none;">Admin</a></li>
+                    <li class="nav__item"><a href="/login.html" class="nav__link" id="login-link">Login</a></li>
+                    <li class="nav__item"><a href="/register.html" class="nav__link" id="register-link">Register</a></li>
+                    <li class="nav__item"><a href="#" class="nav__link" id="logout-link" style="display: none;">Logout</a></li>
+                    <li class="nav__item"><a href="#" class="nav__link" id="theme-toggle">
+                        <img id="modeToggle" class="icon color-icon"
+                             src="/assets/img/theme_light.png"
+                             src-light="/assets/img/theme_light.png"
+                             src-dark="/assets/img/theme_dark.png"
+                             alt="Color theme icon" />
+                    </a></li>
+                </ul>
+            </div>
+            <div class="nav__toggle" id="nav-toggle">
+                <i class='bx bx-menu'></i>
+            </div>
+        </nav>
+    </header>
+
+    <div id="search-results" class="mt-4"></div>
+
+    <script>
+        const API_URL = window.ENV.API_URL;
+        let userToken = localStorage.getItem('userToken');
+
+        async function updateNav() {
+            try {
+                if (!userToken) {
+                    document.getElementById('login-link').style.display = 'block';
+                    document.getElementById('register-link').style.display = 'block';
+                    document.getElementById('profile-link').style.display = 'none';
+                    document.getElementById('logout-link').style.display = 'none';
+                    document.getElementById('admin-link').style.display = 'none';
+                    return;
+                }
+                const response = await fetch(`${API_URL}/api/verify-token`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('login-link').style.display = 'none';
+                    document.getElementById('register-link').style.display = 'none';
+                    document.getElementById('profile-link').style.display = 'block';
+                    document.getElementById('logout-link').style.display = 'block';
+                    if (data.isAdmin) {
+                        document.getElementById('admin-link').style.display = 'block';
+                    }
+                } else {
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('refreshToken');
+                    userToken = null;
+                    document.getElementById('login-link').style.display = 'block';
+                    document.getElementById('register-link').style.display = 'block';
+                    document.getElementById('profile-link').style.display = 'none';
+                    document.getElementById('logout-link').style.display = 'none';
+                    document.getElementById('admin-link').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error verifying token:', error);
+                Toastify({
+                    text: 'Error verifying token',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        }
+
+async function loadSearchResults(query) {
+    try {
+        const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
+            headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'فشل جلب نتائج البحث');
+        }
+        const users = await response.json();
+        const searchResults = document.getElementById('search-results');
+        searchResults.classList.remove('hidden');
+        searchResults.innerHTML = users.length ? users.map(user => `
+            <div class="user-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-4 flex items-center space-x-4 cursor-pointer hover:shadow-lg transition-shadow duration-300" onclick="window.location.href='/profile/${user.profile.nickname || user.username}'">
+                <img src="${user.profile.avatar || '/assets/img/default-avatar.png'}" alt="${user.profile.nickname || user.username}" class="w-16 h-16 rounded-full object-cover">
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${user.profile.nickname || user.username}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400"><strong>الوظيفة:</strong> ${user.profile.jobTitle || 'غير محدد'}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400"><strong>الحالة:</strong> ${user.profile.status || 'غير متوفر'}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400"><strong>نبذة:</strong> ${user.profile.bio ? user.profile.bio.substring(0, 100) + (user.profile.bio.length > 100 ? '...' : '') : 'غير محدد'}</p>
+                    <div class="skills flex space-x-2 mt-2">
+                        ${user.profile.skills?.length ? user.profile.skills.slice(0, 3).map(skill => `<span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded">${skill.name}</span>`).join('') : '<span class="text-xs text-gray-500">لا توجد مهارات</span>'}
+                    </div>
+                </div>
+                <a href="${API_URL}/api/profile/pdf/${user.profile.nickname || user.username}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">تحميل السيرة الذاتية</a>
+            </div>
+        `).join('') : '<p class="text-center text-gray-600 dark:text-gray-400 p-4">لم يتم العثور على مستخدمين.</p>';
+    } catch (error) {
+        console.error('خطأ في البحث عن المستخدمين:', error);
+        Toastify({
+            text: `خطأ في البحث: ${error.message}`,
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+    }
+}
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 2) {
+                loadSearchResults(query);
+            } else {
+                document.getElementById('search-results').innerHTML = '';
+            }
+        });
+
+        document.getElementById('logout-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch(`${API_URL}/api/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') })
+                });
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('refreshToken');
+                userToken = null;
+                updateNav();
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Logout failed:', error);
+                Toastify({
+                    text: 'Error during logout',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            }
+        });
+
+        document.getElementById('theme-toggle').addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            const modeToggle = document.getElementById('modeToggle');
+            modeToggle.src = newTheme === 'light' ? modeToggle.getAttribute('src-light') : modeToggle.getAttribute('src-dark');
+        });
+
+        document.getElementById('nav-toggle').addEventListener('click', () => {
+            document.getElementById('nav-menu').classList.toggle('show');
+        });
+
+        document.querySelectorAll('.nav__link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('nav-menu').classList.remove('show');
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const modeToggle = document.getElementById('modeToggle');
+            modeToggle.src = savedTheme === 'light' ? modeToggle.getAttribute('src-light') : modeToggle.getAttribute('src-dark');
+            updateNav();
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error')) {
+            Toastify({
+                text: `Error: ${urlParams.get('error')}`,
+                duration: 3000,
+                style: { background: '#ef4444' }
+            }).showToast();
+        }
+    </script>
+</body>
+</html>

@@ -558,245 +558,224 @@
     return data.csrfToken;
 }
 
-        document.getElementById('profile-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            const formData = new FormData();
-            const loader = document.getElementById('loader');
-            formData.append('_csrf', await getCsrfToken());
-            const portfolioName = document.getElementById('portfolioName').value.trim();
-            const nickname = document.getElementById('nickname').value.trim();
-            const jobTitle = document.getElementById('jobTitle').value.trim();
-            const bio = document.getElementById('bio').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const isPublic = document.getElementById('isPublic').value;
-            const socialLinks = {
-                linkedin: document.getElementById('social-linkedin').value.trim(),
-                behance: document.getElementById('social-behance').value.trim(),
-                github: document.getElementById('social-github').value.trim(),
-                whatsapp: document.getElementById('social-whatsapp').value.trim()
-            };
-            const avatarDisplayType = document.getElementById('avatarDisplayType').value;
-            const svgColor = document.getElementById('svgColor').value;
+    const formData = new FormData();
+    const loader = document.getElementById('loader');
+    formData.append('_csrf', await getCsrfToken());
+    const portfolioName = document.getElementById('portfolioName').value.trim();
+    const nickname = document.getElementById('nickname').value.trim();
+    const jobTitle = document.getElementById('jobTitle').value.trim();
+    const bio = document.getElementById('bio').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const isPublic = document.getElementById('isPublic').value;
+    const socialLinks = {
+        linkedin: document.getElementById('social-linkedin').value.trim(),
+        behance: document.getElementById('social-behance').value.trim(),
+        github: document.getElementById('social-github').value.trim(),
+        whatsapp: document.getElementById('social-whatsapp').value.trim()
+    };
+    const avatarDisplayType = document.getElementById('avatarDisplayType').value;
+    const svgColor = document.getElementById('svgColor').value;
+    const pdfFormat = document.getElementById('pdfFormat').value;
 
-            if (!nickname || !jobTitle || !bio) {
-                Toastify({
-                    text: 'Nickname, Job Title, and Bio are required.',
-                    duration: 3000,
-                    style: { background: '#ef4444' }
-                }).showToast();
-                return;
-            }
+    if (!nickname || !jobTitle || !bio) {
+        Toastify({
+            text: 'الاسم المستعار، الوظيفة، والنبذة مطلوبة.',
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+        return;
+    }
 
-            if (phone && !/^\+?[1-9]\d{1,14}$/.test(phone)) {
-                Toastify({
-                    text: 'Invalid phone number format (e.g., +1234567890).',
-                    duration: 3000,
-                    style: { background: '#ef4444' }
-                }).showToast();
-                return;
-            }
+    if (phone && !/^\+?[1-9]\d{1,14}$/.test(phone)) {
+        Toastify({
+            text: 'رقم الهاتف غير صحيح (مثال: +1234567890).',
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+        return;
+    }
 
-            const isValidUrl = (url) => {
-                if (!url) return true; // Allow empty URLs
-                try {
-                    new URL(url);
-                    return true;
-                } catch {
-                    return false;
-                }
-            };
+    const isValidUrl = (url) => {
+        if (!url) return true;
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    };
 
-            for (const [key, url] of Object.entries(socialLinks)) {
-                if (url && !isValidUrl(url)) {
-                    Toastify({
-                        text: `Invalid ${key.charAt(0).toUpperCase() + key.slice(1)} URL.`,
-                        duration: 3000,
-                        style: { background: '#ef4444' }
-                    }).showToast();
-                    return;
-                }
-            }
-
-            formData.append('portfolioName', portfolioName);
-            formData.append('nickname', nickname);
-            formData.append('jobTitle', jobTitle);
-            formData.append('bio', bio);
-            formData.append('phone', phone);
-            formData.append('isPublic', isPublic);
-            formData.append('socialLinks', JSON.stringify(socialLinks));
-            formData.append('avatarDisplayType', avatarDisplayType);
-            formData.append('svgColor', svgColor);
-
-            const avatarFile = document.getElementById('avatar').files[0];
-            if (avatarFile) formData.append('avatar', avatarFile);
-
-            const education = [];
-            document.querySelectorAll('#education-fields .dynamic-field').forEach(field => {
-                const institution = field.querySelector('[name="institution"]').value.trim();
-                const degree = field.querySelector('[name="degree"]').value.trim();
-                const year = field.querySelector('[name="year"]').value.trim();
-                if (institution && degree && year) {
-                    education.push({ institution, degree, year });
-                }
-            });
-
-            const experience = [];
-            document.querySelectorAll('#experience-fields .dynamic-field').forEach(field => {
-                const company = field.querySelector('[name="company"]').value.trim();
-                const role = field.querySelector('[name="role"]').value.trim();
-                const duration = field.querySelector('[name="duration"]').value.trim();
-                if (company && role && duration) {
-                    experience.push({ company, role, duration });
-                }
-            });
-
-            document.querySelectorAll('#education-fields .dynamic-field').forEach(field => {
-    const institution = field.querySelector('[name="institution"]').value.trim();
-    const degree = field.querySelector('[name="degree"]').value.trim();
-    const year = field.querySelector('[name="year"]').value.trim();
-    if (institution || degree || year) { // لو أي حقل مش فاضي، لازم الكل يكون مليان
-        if (!institution || !degree || !year) {
+    for (const [key, url] of Object.entries(socialLinks)) {
+        if (url && !isValidUrl(url)) {
             Toastify({
-                text: 'All education fields (Institution, Degree, Year) are required.',
+                text: `رابط ${key} غير صحيح.`,
                 duration: 3000,
                 style: { background: '#ef4444' }
             }).showToast();
             return;
         }
-        education.push({ institution, degree, year });
     }
-});
 
-            const certificates = [];
-            document.querySelectorAll('#certificate-fields .dynamic-field').forEach(field => {
-                const name = field.querySelector('[name="name"]').value.trim();
-                const issuer = field.querySelector('[name="issuer"]').value.trim();
-                const year = field.querySelector('[name="year"]').value.trim();
-                if (name && issuer && year) {
-                    certificates.push({ name, issuer, year });
-                }
-            });
+    formData.append('portfolioName', portfolioName);
+    formData.append('nickname', nickname);
+    formData.append('jobTitle', jobTitle);
+    formData.append('bio', bio);
+    formData.append('phone', phone);
+    formData.append('isPublic', isPublic);
+    formData.append('socialLinks', JSON.stringify(socialLinks));
+    formData.append('avatarDisplayType', avatarDisplayType);
+    formData.append('svgColor', svgColor);
+    formData.append('pdfFormat', pdfFormat);
 
-            const skills = [];
-            document.querySelectorAll('#skill-fields .dynamic-field').forEach(field => {
-                const name = field.querySelector('[name="name"]').value.trim();
-                const percentage = parseInt(field.querySelector('[name="percentage"]').value);
-                if (name && !isNaN(percentage) && percentage >= 0 && percentage <= 100) {
-                    skills.push({ name, percentage });
-                }
-            });
+    const avatarFile = document.getElementById('avatar').files[0];
+    if (avatarFile) formData.append('avatar', avatarFile);
 
-            const projects = [];
-            let hasInvalidUrl = false;
-            document.querySelectorAll('#project-fields .dynamic-field').forEach((field, index) => {
-                const title = field.querySelector('[name="title"]').value.trim();
-                const description = field.querySelector('[name="description"]').value.trim();
-                const imageFile = field.querySelector('[name="image"]').files[0];
-                const links = [];
-                field.querySelectorAll('.link-fields .link-field').forEach(link => {
-                    const option = link.querySelector('[name="option"]').value.trim();
-                    const value = link.querySelector('[name="value"]').value.trim();
-                    if (option && value) {
-                        if (isValidUrl(value)) {
-                            links.push({ option, value });
-                        } else {
-                            hasInvalidUrl = true;
-                        }
-                    }
-                });
-                if (hasInvalidUrl) return;
-                if (title && description) {
-                    projects.push({ title, description, links });
-                    if (imageFile) formData.append('projectImages', imageFile);
-                }
-            });
-
-            if (hasInvalidUrl) {
+    const education = [];
+    let educationValid = true;
+    document.querySelectorAll('#education-fields .dynamic-field').forEach(field => {
+        const institution = field.querySelector('[name="institution"]').value.trim();
+        const degree = field.querySelector('[name="degree"]').value.trim();
+        const year = field.querySelector('[name="year"]').value.trim();
+        if (institution || degree || year) {
+            if (!institution || !degree || !year) {
+                educationValid = false;
                 Toastify({
-                    text: 'Invalid URL in project links.',
+                    text: 'جميع حقول التعليم (المؤسسة، الدرجة، السنة) مطلوبة.',
                     duration: 3000,
                     style: { background: '#ef4444' }
                 }).showToast();
                 return;
             }
+            education.push({ institution, degree, year });
+        }
+    });
+    if (!educationValid) return;
 
-            const interests = [];
-            document.querySelectorAll('#interest-fields .dynamic-field').forEach(field => {
-                const interest = field.querySelector('[name="interest"]').value.trim();
-                if (interest) interests.push(interest);
-            });
+    const experience = [];
+    document.querySelectorAll('#experience-fields .dynamic-field').forEach(field => {
+        const company = field.querySelector('[name="company"]').value.trim();
+        const role = field.querySelector('[name="role"]').value.trim();
+        const duration = field.querySelector('[name="duration"]').value.trim();
+        if (company && role && duration) {
+            experience.push({ company, role, duration });
+        }
+    });
 
-            const safeStringify = (data, defaultValue) => {
-                try {
-                    return JSON.stringify(data);
-                } catch (error) {
-                    console.error('Error stringifying data:', error);
-                    return JSON.stringify(defaultValue);
+    const certificates = [];
+    document.querySelectorAll('#certificate-fields .dynamic-field').forEach(field => {
+        const name = field.querySelector('[name="name"]').value.trim();
+        const issuer = field.querySelector('[name="issuer"]').value.trim();
+        const year = field.querySelector('[name="year"]').value.trim();
+        if (name && issuer && year) {
+            certificates.push({ name, issuer, year });
+        }
+    });
+
+    const skills = [];
+    document.querySelectorAll('#skill-fields .dynamic-field').forEach(field => {
+        const name = field.querySelector('[name="name"]').value.trim();
+        const percentage = parseInt(field.querySelector('[name="percentage"]').value);
+        if (name && !isNaN(percentage) && percentage >= 0 && percentage <= 100) {
+            skills.push({ name, percentage });
+        }
+    });
+
+    const projects = [];
+    let hasInvalidUrl = false;
+    document.querySelectorAll('#project-fields .dynamic-field').forEach((field, index) => {
+        const title = field.querySelector('[name="title"]').value.trim();
+        const description = field.querySelector('[name="description"]').value.trim();
+        const imageFile = field.querySelector('[name="image"]').files[0];
+        const links = [];
+        field.querySelectorAll('.link-fields .link-field').forEach(link => {
+            const option = link.querySelector('[name="option"]').value.trim();
+            const value = link.querySelector('[name="value"]').value.trim();
+            if (option && value) {
+                if (isValidUrl(value)) {
+                    links.push({ option, value });
+                } else {
+                    hasInvalidUrl = true;
                 }
-            };
-
-            formData.append('education', safeStringify(education, []));
-            formData.append('experience', safeStringify(experience, []));
-            formData.append('certificates', safeStringify(certificates, []));
-            formData.append('skills', safeStringify(skills, []));
-            formData.append('projects', safeStringify(projects, []));
-            formData.append('interests', safeStringify(interests, []));
-
-            loader.style.display = 'flex';
-
-            try {
-const response = await fetch(`${API_URL}/api/profile`, {
-    method: 'PUT',
-    headers: {
-        'Authorization': `Bearer ${userToken}`,
-        'X-CSRF-Token': document.getElementById('csrf-token').value
-    },
-    body: formData
-});
-
-                const text = await response.text();
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch {
-                    throw new Error('Invalid server response');
-                }
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to update profile');
-                }
-
-                if (data.hasTransparency) {
-                    document.getElementById('avatar-suggestion').classList.remove('hidden');
-                    document.getElementById('avatar-suggestion').textContent = 'Image has a transparent background. Recommended: Use "Inside SVG" for a custom shape and color.';
-                    document.getElementById('avatarDisplayType').value = 'svg';
-                    toggleSvgColorField();
-                } else if (avatarFile) {
-                    document.getElementById('avatar-suggestion').classList.remove('hidden');
-                    document.getElementById('avatar-suggestion').textContent = 'Image has a background. Recommended: Use "Normal Image" for best display.';
-                    document.getElementById('avatarDisplayType').value = 'normal';
-                    toggleSvgColorField();
-                }
-
-                Toastify({
-                    text: 'Profile updated successfully!',
-                    duration: 3000,
-                    style: { background: '#10b981' }
-                }).showToast();
-                setTimeout(() => window.location.href = `/profile/${data.profile.nickname}`, 2000);
-            } catch (error) {
-                console.error('Error updating profile:', error);
-                Toastify({
-                    text: `Error updating profile: ${error.message}`,
-                    duration: 3000,
-                    style: { background: '#ef4444' }
-                }).showToast();
-            } finally {
-                loader.style.display = 'none';
             }
         });
+        if (hasInvalidUrl) return;
+        if (title && description) {
+            projects.push({ title, description, links });
+            if (imageFile) formData.append(`projectImages[${index}]`, imageFile);
+        }
+    });
 
+    if (hasInvalidUrl) {
+        Toastify({
+            text: 'رابط غير صحيح في روابط المشروع.',
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+        return;
+    }
+
+    const interests = [];
+    document.querySelectorAll('#interest-fields .dynamic-field').forEach(field => {
+        const interest = field.querySelector('[name="interest"]').value.trim();
+        if (interest) interests.push(interest);
+    });
+
+    formData.append('education', JSON.stringify(education));
+    formData.append('experience', JSON.stringify(experience));
+    formData.append('certificates', JSON.stringify(certificates));
+    formData.append('skills', JSON.stringify(skills));
+    formData.append('projects', JSON.stringify(projects));
+    formData.append('interests', JSON.stringify(interests));
+
+    loader.style.display = 'flex';
+
+    try {
+        const response = await fetch(`${API_URL}/api/profile`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${userToken}`,
+                'X-CSRF-Token': document.getElementById('csrf-token').value
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error || 'فشل تحديث الملف الشخصي');
+        }
+
+        if (data.hasTransparency) {
+            document.getElementById('avatar-suggestion').classList.remove('hidden');
+            document.getElementById('avatar-suggestion').textContent = 'الصورة تحتوي على خلفية شفافة. يُوصى باستخدام "داخل SVG" لشكل وألوان مخصصة.';
+            document.getElementById('avatarDisplayType').value = 'svg';
+            toggleSvgColorField();
+        } else if (avatarFile) {
+            document.getElementById('avatar-suggestion').classList.remove('hidden');
+            document.getElementById('avatar-suggestion').textContent = 'الصورة تحتوي على خلفية. يُوصى باستخدام "صورة عادية" لأفضل عرض.';
+            document.getElementById('avatarDisplayType').value = 'normal';
+            toggleSvgColorField();
+        }
+
+        Toastify({
+            text: 'تم تحديث الملف الشخصي بنجاح!',
+            duration: 3000,
+            style: { background: '#10b981' }
+        }).showToast();
+        setTimeout(() => window.location.href = `/profile/${data.profile.nickname}`, 2000);
+    } catch (error) {
+        console.error('خطأ في تحديث الملف الشخصي:', error);
+        Toastify({
+            text: `خطأ في تحديث الملف الشخصي: ${error.message}`,
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+    } finally {
+        loader.style.display = 'none';
+    }
+});
         async function loadProfile() {
             try {
                 const verifyResponse = await fetch(`${API_URL}/api/verify-token`, {
