@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NZQ6642M');</script>
+<!-- End Google Tag Manager --><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
@@ -476,12 +483,21 @@
             <input type="hidden" name="_csrf" id="csrf-token">
             <div class="home__buttons">
                 <a href="#" id="download-cv" class="button">Download CV</a>
+                <a href="${API_URL}/api/profile/docx/${encodeURIComponent(nickname)}" id="download-docx" class="button">Download CV (DOCX)</a>
                 <a href="#" id="create-canva" class="button">Create CV with Canva</a>
                 <a href="#" id="contact-phone" class="button">Contact</a>
             </div>
             <div class="home__social" id="social-links"></div>
+
         </div>
+
+
     </div>
+    <div class="container" id="social-media">
+    <h2 class="section-title text-lg md:text-xl font-semibold mb-4 text-gray-900 dark:text-white">Social Media</h2>
+    <div class="social-media__container" id="facebook-posts"></div>
+    <div class="social-media__container" id="github-repos"></div>
+</div>
 
     <div class="container" id="about">
         <h2 class="section-title text-lg md:text-xl font-semibold mb-4 text-gray-900 dark:text-white">About</h2>
@@ -701,7 +717,8 @@ async function loadProfile() {
         document.querySelectorAll('.container:not(#home)').forEach(container => container.style.display = 'none');
     }
 }
-        async function loadInteractions() {
+       
+async function loadInteractions() {
             const interactionsContainer = document.getElementById('profile-interactions');
             if (!userToken) {
                 interactionsContainer.innerHTML = '<p class="error">Please <a href="/login.html?reason=interactions" class="text-blue-500 hover:underline">login</a> to view interactions.</p>';
@@ -829,6 +846,60 @@ document.getElementById('create-canva').addEventListener('click', async (e) => {
     }
 });
 
+async function loadSocialMedia() {
+    if (!userToken) return;
+
+    // جلب Facebook Posts
+    try {
+        const response = await fetchWithRefresh(`${API_URL}/api/facebook/posts`, {
+            headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const facebookContainer = document.getElementById('facebook-posts');
+            facebookContainer.innerHTML = data.posts.length ? data.posts.map(post => `
+                <div class="comment">
+                    <p><strong>Post:</strong> ${post.message}</p>
+                    <p><strong>Likes:</strong> ${post.likes}</p>
+                    <p><strong>Comments:</strong> ${post.comments}</p>
+                    <p><strong>Shares:</strong> ${post.shares}</p>
+                    <p><strong>Posted on:</strong> ${new Date(post.created_time).toLocaleString()}</p>
+                </div>
+            `).join('') : '<p>No Facebook posts available.</p>';
+        } else {
+            document.getElementById('facebook-posts').innerHTML = '<p class="error">Failed to load Facebook posts. Please link your account.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading Facebook posts:', error);
+        document.getElementById('facebook-posts').innerHTML = '<p class="error">Error loading Facebook posts.</p>';
+    }
+
+    // جلب GitHub Repos
+    try {
+        const response = await fetchWithRefresh(`${API_URL}/api/github/repos`, {
+            headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const githubContainer = document.getElementById('github-repos');
+            githubContainer.innerHTML = data.length ? data.map(repo => `
+                <div class="comment">
+                    <p><strong>Repository:</strong> ${repo.name}</p>
+                    <p><strong>Description:</strong> ${repo.description}</p>
+                    <p><a href="${repo.url}" target="_blank" class="text-blue-500 hover:underline">View on GitHub</a></p>
+                </div>
+            `).join('') : '<p>No GitHub repositories available.</p>';
+        } else {
+            document.getElementById('github-repos').innerHTML = '<p class="error">Failed to load GitHub repositories. Please link your account.</p>';
+        }
+    } catch (error) {
+        console.error('Error loading GitHub repos:', error);
+        document.getElementById('github-repos').innerHTML = '<p class="error">Error loading GitHub repositories.</p>';
+    }
+}
+
+
+
         document.getElementById('theme-toggle').addEventListener('click', (e) => {
             e.preventDefault();
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
@@ -876,13 +947,59 @@ document.getElementById('create-canva').addEventListener('click', async (e) => {
             updateNav();
             loadProfile();
     fetchCsrfToken(); // جلب الـ CSRF token
+    loadSocialMedia();
+
 
             loadInteractions();
         });
 
 
+async function refreshToken() {
+    try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) throw new Error('No refresh token available');
+        const response = await fetch(`${API_URL}/api/refresh-token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.getElementById('csrf-token').value
+            },
+            body: JSON.stringify({ refreshToken })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to refresh token');
+        localStorage.setItem('userToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        return data.accessToken;
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        Toastify({
+            text: 'Session expired. Please login again.',
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login.html?reason=session_expired';
+        return null;
+    }
+}
 
-
+async function fetchWithRefresh(url, options = {}) {
+    let response = await fetch(url, options);
+    if (response.status === 401) {
+        const newToken = await refreshToken();
+        if (newToken) {
+            options.headers = { ...options.headers, 'Authorization': `Bearer ${newToken}` };
+            response = await fetch(url, options);
+        }
+    }
+    return response;
+}
     </script>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NZQ6642M"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 </body>
 </html>
