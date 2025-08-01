@@ -1406,29 +1406,33 @@ document.getElementById('radix-attach').addEventListener('click', () => {
 });
 
 
-        async function loadSearchResults(query) {
-            try {
-                const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
-                    headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to fetch search results');
-                }
-                const users = await response.json();
-                const searchResults = document.getElementById('search-results');
-                searchResults.classList.remove('hidden');
-                searchResults.innerHTML = users.length ? users.map(user => `
-                    <a href="${user.profileUrl}" class="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
-                        <img src="${user.avatar || '/assets/img/default-avatar.png'}" alt="${user.nickname || user.username}" class="inline-block w-8 h-8 rounded-full mr-2">
-                        ${user.nickname || user.username}
-                    </a>
-                `).join('') : '<p class="p-2">No users found.</p>';
-            } catch (error) {
-                console.error('Error searching users:', error);
-                document.getElementById('search-results').innerHTML = '<p class="p-2">Error searching users: ' + error.message;
-            }
+async function loadSearchResults(query) {
+    try {
+        const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
+            headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'فشل جلب نتائج البحث');
         }
+        const users = await response.json();
+        const searchResults = document.getElementById('search-results');
+        searchResults.classList.remove('hidden');
+        searchResults.innerHTML = users.length ? users.map(user => `
+            <a href="/profile/${user.profile.nickname || user.username}" class="block p-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-2">
+                <img src="${user.profile.avatar || '/assets/img/default-avatar.png'}" alt="${user.profile.nickname || user.username}" class="inline-block w-8 h-8 rounded-full">
+                <span class="text-gray-900 dark:text-white">${user.profile.nickname || user.username}</span>
+            </a>
+        `).join('') : '<p class="p-2 text-gray-600 dark:text-gray-400">لم يتم العثور على مستخدمين.</p>';
+    } catch (error) {
+        console.error('خطأ في البحث عن المستخدمين:', error);
+        Toastify({
+            text: `خطأ في البحث: ${error.message}`,
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+    }
+}
 
         document.getElementById('search-input').addEventListener('input', (e) => {
             const query = e.target.value.trim();

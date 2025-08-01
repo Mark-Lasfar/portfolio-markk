@@ -135,6 +135,21 @@
             transition: background-color 0.3s, transform 0.2s;
             cursor: pointer;
         }
+            .user-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .user-card:hover {
+        transform: translateY(-5px);
+    }
+    .skills span {
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .no-results {
+        text-align: center;
+        color: #6b7280;
+        padding: 1rem;
+    }
         .user-card:hover {
             background-color: var(--primary-color-2);
             transform: translateY(-2px);
