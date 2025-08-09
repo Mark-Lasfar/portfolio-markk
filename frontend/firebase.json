@@ -17,6 +17,10 @@
                 "destination": "/profile.html"
             },
             {
+                "source": "/:nickname",
+                "destination": "/profile.html"
+            },
+            {
                 "source": "/profile/me",
                 "destination": "/profile.html"
             },

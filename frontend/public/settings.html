@@ -443,7 +443,13 @@ if (!userToken) {
 }
 
 async function fetchWithRefresh(url, options = {}) {
-    let response = await fetch(url, options);
+    let response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${userToken}`,
+        },
+    });
     const newToken = response.headers.get('X-New-Token');
     if (newToken) {
         localStorage.setItem('userToken', newToken);
@@ -461,18 +467,17 @@ async function fetchWithRefresh(url, options = {}) {
             }
         } else {
             window.location.href = '/login.html?reason=token_refresh_failed';
-            return response;
+            return null;
         }
     }
     return response;
 }
 
-
 async function refreshToken() {
     try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) throw new Error('No refresh token available');
-        const response = await fetchWithRefresh(`${API_URL}/api/refresh-token`, {
+        const response = await fetch(`${API_URL}/api/refresh-token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -502,9 +507,7 @@ async function refreshToken() {
 
 async function getCsrfToken() {
     try {
-        const response = await fetchWithRefresh(`${API_URL}/api/csrf-token`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
-        });
+        const response = await fetchWithRefresh(`${API_URL}/api/csrf-token`);
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Failed to fetch CSRF token');
         document.getElementById('csrf-token').value = data.csrfToken;
@@ -519,7 +522,6 @@ async function getCsrfToken() {
         return null;
     }
 }
-
 
 function toggleSvgColorField() {
     const avatarDisplayType = document.getElementById('avatarDisplayType').value;
@@ -599,10 +601,13 @@ document.getElementById('add-skill').addEventListener('click', () => {
 
 document.getElementById('add-project').addEventListener('click', () => {
     addDynamicField('project-fields', `
+        <input type="checkbox" name="isPrivate" class="mb-2"> <label>رابط خاص</label>
         <input type="text" name="title" placeholder="عنوان المشروع" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
         <textarea name="description" placeholder="وصف المشروع" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" rows="3"></textarea>
         <input type="file" name="image" accept="image/jpeg,image/png" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
         <button type="button" class="remove-image add-btn">إزالة الصورة</button>
+        <input type="text" name="rating" placeholder="التقييم (مثل: جيد)" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+        <input type="number" name="stars" placeholder="النجوم (0-5)" min="0" max="5" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
         <div class="link-fields"></div>
         <button type="button" class="add-link add-btn">إضافة رابط</button>
         <button type="button" class="remove-field add-btn">إزالة المشروع</button>
@@ -645,6 +650,8 @@ document.addEventListener('change', function(e) {
                 const preview = document.createElement('img');
                 preview.src = e.target.result;
                 preview.className = 'w-24 h-24 rounded-full mt-2';
+                const existingPreview = e.target.parentElement.querySelector('img');
+                if (existingPreview) existingPreview.remove();
                 e.target.after(preview);
             };
             reader.readAsDataURL(file);
@@ -660,14 +667,12 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
     loader.style.display = 'flex';
 
     try {
-        // جلب CSRF token مرة واحدة في بداية العملية
         const csrfToken = await getCsrfToken();
         if (!csrfToken) {
             throw new Error('فشل جلب رمز CSRF');
         }
         formData.append('_csrf', csrfToken);
 
-        // جمع البيانات من الفورم
         const portfolioName = document.getElementById('portfolioName').value.trim();
         const nickname = document.getElementById('nickname').value.trim();
         const jobTitle = document.getElementById('jobTitle').value.trim();
@@ -675,6 +680,7 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
         const phone = document.getElementById('phone').value.trim();
         const isPublic = document.getElementById('isPublic').value;
         const socialLinks = {
+            
             linkedin: document.getElementById('social-linkedin').value.trim(),
             behance: document.getElementById('social-behance').value.trim(),
             github: document.getElementById('social-github').value.trim(),
@@ -685,31 +691,49 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
         const pdfFormat = document.getElementById('pdfFormat').value;
 
         // التحقق من الحقول الإجبارية
-        if (!nickname || !jobTitle || !bio) {
+        if (!nickname) {
             Toastify({
-                text: 'الاسم المستعار، الوظيفة، والنبذة مطلوبة.',
+                text: 'الاسم المستعار مطلوب.',
+                duration: 3000,
+                style: { background: '#ef4444' }
+            }).showToast();
+            return;
+        }
+        if (!jobTitle) {
+            Toastify({
+                text: 'الوظيفة مطلوبة.',
+                duration: 3000,
+                style: { background: '#ef4444' }
+            }).showToast();
+            return;
+        }
+        if (!bio) {
+            Toastify({
+                text: 'النبذة مطلوبة.',
                 duration: 3000,
                 style: { background: '#ef4444' }
             }).showToast();
             return;
         }
 
-        // التحقق من توفر الـ nickname
-        const nicknameResponse = await fetchWithRefresh(`${API_URL}/api/check-nickname?nickname=${encodeURIComponent(nickname)}`, {
-            headers: { 'Authorization': `Bearer ${userToken}` },
-            timeout: 5000 // إضافة timeout للـ API call
-        });
-        const nicknameData = await nicknameResponse.json();
-        if (!nicknameData.available) {
-            Toastify({
-                text: 'الاسم المستعار مستخدم بالفعل. الرجاء اختيار اسم آخر.',
-                duration: 3000,
-                style: { background: '#ef4444' }
-            }).showToast();
-            return;
+        // التحقق من توفر الاسم المستعار إذا تغير
+        const currentNickname = (await loadProfile()).profile.nickname;
+        if (nickname && nickname !== currentNickname) {
+            const nicknameResponse = await fetchWithRefresh(`${API_URL}/api/check-nickname?nickname=${encodeURIComponent(nickname)}`, {
+                headers: { 'Authorization': `Bearer ${userToken}` },
+                timeout: 5000
+            });
+            const nicknameData = await nicknameResponse.json();
+            if (!nicknameData.available) {
+                Toastify({
+                    text: 'الاسم المستعار مستخدم بالفعل. الرجاء اختيار اسم آخر.',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+                return;
+            }
         }
 
-        // التحقق من رقم الهاتف
         const isValidPhone = (phone) => {
             if (!phone) return true;
             return /^\+?[1-9]\d{1,14}$/.test(phone);
@@ -723,7 +747,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             return;
         }
 
-        // التحقق من روابط التواصل الاجتماعي
         const isValidUrl = (url) => {
             if (!url) return true;
             try {
@@ -744,7 +767,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             }
         }
 
-        // إضافة البيانات إلى FormData
         formData.append('portfolioName', portfolioName);
         formData.append('nickname', nickname);
         formData.append('jobTitle', jobTitle);
@@ -756,7 +778,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
         formData.append('svgColor', svgColor);
         formData.append('pdfFormat', pdfFormat);
 
-        // التحقق من الصورة الشخصية
         const avatarFile = document.getElementById('avatar').files[0];
         if (avatarFile) {
             const maxSize = 5 * 1024 * 1024; // 5MB
@@ -780,7 +801,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             formData.append('avatar', avatarFile);
         }
 
-        // جمع وتدقيق بيانات التعليم
         const education = [];
         let educationValid = true;
         document.querySelectorAll('#education-fields .dynamic-field').forEach(field => {
@@ -802,7 +822,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
         });
         if (!educationValid) return;
 
-        // جمع بيانات الخبرة
         const experience = [];
         document.querySelectorAll('#experience-fields .dynamic-field').forEach(field => {
             const company = field.querySelector('[name="company"]').value.trim();
@@ -813,7 +832,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             }
         });
 
-        // جمع بيانات الشهادات
         const certificates = [];
         document.querySelectorAll('#certificate-fields .dynamic-field').forEach(field => {
             const name = field.querySelector('[name="name"]').value.trim();
@@ -824,7 +842,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             }
         });
 
-        // جمع بيانات المهارات
         const skills = [];
         document.querySelectorAll('#skill-fields .dynamic-field').forEach(field => {
             const name = field.querySelector('[name="name"]').value.trim();
@@ -834,13 +851,14 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             }
         });
 
-        // جمع بيانات المشاريع
         const projects = [];
         let hasInvalidUrl = false;
         document.querySelectorAll('#project-fields .dynamic-field').forEach((field, index) => {
             const title = field.querySelector('[name="title"]').value.trim();
             const description = field.querySelector('[name="description"]').value.trim();
             const imageFile = field.querySelector('[name="image"]').files[0];
+            const rating = field.querySelector('[name="rating"]').value.trim();
+            const stars = parseInt(field.querySelector('[name="stars"]').value);
             const links = [];
             field.querySelectorAll('.link-fields .link-field').forEach(link => {
                 const option = link.querySelector('[name="option"]').value.trim();
@@ -854,8 +872,8 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
                 }
             });
             if (hasInvalidUrl) return;
-            if (title && description) {
-                projects.push({ title, description, links });
+            if (title && description && rating && !isNaN(stars) && stars >= 0 && stars <= 5) {
+                projects.push({ title, description, links, rating, stars });
                 if (imageFile) {
                     const maxSize = 5 * 1024 * 1024; // 5MB
                     const allowedTypes = ['image/jpeg', 'image/png'];
@@ -890,14 +908,12 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             return;
         }
 
-        // جمع بيانات الاهتمامات
         const interests = [];
         document.querySelectorAll('#interest-fields .dynamic-field').forEach(field => {
             const interest = field.querySelector('[name="interest"]').value.trim();
             if (interest) interests.push(interest);
         });
 
-        // إضافة البيانات المجمعة إلى FormData
         formData.append('education', JSON.stringify(education));
         formData.append('experience', JSON.stringify(experience));
         formData.append('certificates', JSON.stringify(certificates));
@@ -905,13 +921,11 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
         formData.append('projects', JSON.stringify(projects));
         formData.append('interests', JSON.stringify(interests));
 
-        // إرسال الطلب لتحديث الملف الشخصي
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 ثوان timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         const response = await fetchWithRefresh(`${API_URL}/api/profile`, {
             method: 'PUT',
             headers: {
-                'Authorization': `Bearer ${userToken}`,
                 'X-CSRF-Token': csrfToken
             },
             body: formData,
@@ -924,7 +938,6 @@ document.getElementById('profile-form').addEventListener('submit', async (e) => 
             throw new Error(data.error || 'فشل تحديث الملف الشخصي');
         }
 
-        // التعامل مع شفافية الصورة
         if (data.hasTransparency) {
             document.getElementById('avatar-suggestion').classList.remove('hidden');
             document.getElementById('avatar-suggestion').textContent = 'الصورة تحتوي على خلفية شفافة. يُوصى باستخدام "داخل SVG" لشكل وألوان مخصصة.';
@@ -998,14 +1011,10 @@ document.getElementById('delete-account').addEventListener('click', async () => 
 
 async function loadProfile() {
     try {
-        const verifyResponse = await fetchWithRefresh(`${API_URL}/api/verify-token`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
-        });
+        const verifyResponse = await fetchWithRefresh(`${API_URL}/api/verify-token`);
         if (!verifyResponse.ok) throw new Error('Invalid token');
 
-        const response = await fetchWithRefresh(`${API_URL}/api/profile/me`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
-        });
+        const response = await fetchWithRefresh(`${API_URL}/api/profile/me`);
         if (!response.ok) {
             const text = await response.text();
             let data;
@@ -1033,6 +1042,17 @@ async function loadProfile() {
         document.getElementById('svgColor').value = data.profile.svgColor || '#000000';
         document.getElementById('pdfFormat').value = data.profile.pdfFormat || 'jspdf';
         toggleSvgColorField();
+
+        // عرض الصورة الشخصية المحفوظة
+        if (data.profile.avatar) {
+            const avatarPreview = document.createElement('img');
+            avatarPreview.src = data.profile.avatar;
+            avatarPreview.className = 'w-24 h-24 rounded-full mt-2';
+            const avatarInput = document.getElementById('avatar');
+            const existingPreview = avatarInput.parentElement.querySelector('img');
+            if (existingPreview) existingPreview.remove();
+            avatarInput.after(avatarPreview);
+        }
 
         if (data.hasTransparency) {
             document.getElementById('avatar-suggestion').classList.remove('hidden');
@@ -1095,6 +1115,8 @@ async function loadProfile() {
                 <textarea name="description" placeholder="وصف المشروع" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" rows="3">${project.description}</textarea>
                 <input type="file" name="image" accept="image/jpeg,image/png" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                 <button type="button" class="remove-image add-btn">إزالة الصورة</button>
+                <input type="text" name="rating" placeholder="التقييم (مثل: جيد)" value="${project.rating}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="number" name="stars" placeholder="النجوم (0-5)" value="${project.stars}" min="0" max="5" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                 <div class="link-fields">
                     ${project.links.map(link => `
                         <div class="link-field">
@@ -1108,6 +1130,12 @@ async function loadProfile() {
                 <button type="button" class="remove-field add-btn">إزالة المشروع</button>
             `;
             projectContainer.appendChild(field);
+            if (project.image) {
+                const imgPreview = document.createElement('img');
+                imgPreview.src = project.image;
+                imgPreview.className = 'w-24 h-24 rounded mt-2';
+                field.querySelector('[name="image"]').after(imgPreview);
+            }
             field.querySelector('.remove-field').addEventListener('click', () => field.remove());
             field.querySelector('.add-link').addEventListener('click', () => {
                 const linkContainer = field.querySelector('.link-fields');
@@ -1124,6 +1152,8 @@ async function loadProfile() {
             field.querySelector('.remove-image')?.addEventListener('click', () => {
                 const imageInput = field.querySelector('[name="image"]');
                 imageInput.value = '';
+                const imgPreview = field.querySelector('img');
+                if (imgPreview) imgPreview.remove();
             });
         });
 
@@ -1135,22 +1165,22 @@ async function loadProfile() {
                 <button type="button" class="remove-field add-btn">إزالة</button>
             `);
         });
+
+        return data; // إرجاع البيانات للاستخدام في التحقق من الاسم المستعار
     } catch (error) {
         console.error('Error loading profile:', error);
         Toastify({
-            text: `خطأ في تحميل الملف الشخصي: ${error.message}`,
+            text: `خطأ في تحميل الملف الشخصي: ${error.message}. حاول تحديث الصفحة.`,
             duration: 3000,
             style: { background: '#ef4444' }
         }).showToast();
-        window.location.href = '/login.html?reason=profile_load_failed';
+        return null;
     }
 }
 
 async function updateNav() {
     try {
-        const response = await fetchWithRefresh(`${API_URL}/api/verify-token`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
-        });
+        const response = await fetchWithRefresh(`${API_URL}/api/verify-token`);
         if (response.ok) {
             const data = await response.json();
             document.getElementById('login-link').style.display = 'none';
@@ -1186,7 +1216,6 @@ async function loadSearchResults(query) {
     try {
         const response = await fetchWithRefresh(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
             headers: {
-                'Authorization': `Bearer ${userToken}`,
                 'X-CSRF-Token': await getCsrfToken()
             }
         });
@@ -1236,7 +1265,6 @@ document.getElementById('logout-link').addEventListener('click', async (e) => {
         const response = await fetchWithRefresh(`${API_URL}/api/logout`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${userToken}`,
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': await getCsrfToken()
             },
@@ -1263,16 +1291,19 @@ document.getElementById('nickname').addEventListener('blur', async () => {
     const nickname = document.getElementById('nickname').value.trim();
     if (nickname) {
         try {
-            const response = await fetchWithRefresh(`${API_URL}/api/check-nickname?nickname=${encodeURIComponent(nickname)}`, {
-                headers: { 'Authorization': `Bearer ${userToken}` }
-            });
-            const data = await response.json();
-            if (!data.available) {
-                Toastify({
-                    text: 'الاسم المستعار مستخدم بالفعل. الرجاء اختيار اسم آخر.',
-                    duration: 3000,
-                    style: { background: '#ef4444' }
-                }).showToast();
+            const currentProfile = await loadProfile();
+            if (nickname !== currentProfile.profile.nickname) {
+                const response = await fetchWithRefresh(`${API_URL}/api/check-nickname?nickname=${encodeURIComponent(nickname)}`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                const data = await response.json();
+                if (!data.available) {
+                    Toastify({
+                        text: 'الاسم المستعار مستخدم بالفعل. الرجاء اختيار اسم آخر.',
+                        duration: 3000,
+                        style: { background: '#ef4444' }
+                    }).showToast();
+                }
             }
         } catch (error) {
             console.error('Error checking nickname:', error);
@@ -1310,9 +1341,7 @@ async function loadSocialMedia() {
     });
 
     try {
-        const facebookResponse = await fetchWithRefresh(`${API_URL}/api/facebook/posts`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
-        });
+        const facebookResponse = await fetchWithRefresh(`${API_URL}/api/facebook/posts`);
         if (facebookResponse.ok) {
             const data = await facebookResponse.json();
             const facebookContainer = document.getElementById('facebook-posts');
@@ -1334,9 +1363,7 @@ async function loadSocialMedia() {
     }
 
     try {
-        const githubResponse = await fetchWithRefresh(`${API_URL}/api/github/repos`, {
-            headers: { 'Authorization': `Bearer ${userToken}` }
-        });
+        const githubResponse = await fetchWithRefresh(`${API_URL}/api/github/repos`);
         if (githubResponse.ok) {
             const data = await githubResponse.json();
             const githubContainer = document.getElementById('github-repos');

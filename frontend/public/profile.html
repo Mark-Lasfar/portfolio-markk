@@ -545,180 +545,259 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         const API_URL = window.ENV.API_URL;
         let userToken = localStorage.getItem('userToken');
 
-        async function updateNav() {
-            try {
-                const response = await fetch(`${API_URL}/api/verify-token`, {
-                    headers: { 'Authorization': `Bearer ${userToken}` }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('login-link').style.display = 'none';
-                    document.getElementById('register-link').style.display = 'none';
-                    document.getElementById('profile-link').style.display = 'block';
-                    document.getElementById('logout-link').style.display = 'block';
-                    if (data.isAdmin) {
-                        document.getElementById('admin-link').style.display = 'block';
-                    }
-                } else {
-                    localStorage.removeItem('userToken');
-                    localStorage.removeItem('refreshToken');
-                    document.getElementById('login-link').style.display = 'block';
-                    document.getElementById('register-link').style.display = 'block';
-                    document.getElementById('profile-link').style.display = 'none';
-                    document.getElementById('logout-link').style.display = 'none';
-                    document.getElementById('admin-link').style.display = 'none';
-                }
-            } catch (error) {
-                console.error('Error verifying token:', error);
-                Toastify({
-                    text: 'Error verifying token',
-                    duration: 3000,
-                    style: { background: '#ef4444' }
-                }).showToast();
+async function updateNav() {
+    if (!userToken) {
+        document.getElementById('login-link').style.display = 'block';
+        document.getElementById('register-link').style.display = 'block';
+        document.getElementById('profile-link').style.display = 'none';
+        document.getElementById('logout-link').style.display = 'none';
+        document.getElementById('admin-link').style.display = 'none';
+        return;
+    }
+
+    try {
+        const response = await fetchWithRefresh(`${API_URL}/api/verify-token`, {
+            headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('login-link').style.display = 'none';
+            document.getElementById('register-link').style.display = 'none';
+            document.getElementById('profile-link').style.display = 'block';
+            document.getElementById('logout-link').style.display = 'block';
+            if (data.isAdmin) {
+                document.getElementById('admin-link').style.display = 'block';
             }
+        } else if (response.status === 401) {
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('refreshToken');
+            userToken = null;
+            document.getElementById('login-link').style.display = 'block';
+            document.getElementById('register-link').style.display = 'block';
+            document.getElementById('profile-link').style.display = 'none';
+            document.getElementById('logout-link').style.display = 'none';
+            document.getElementById('admin-link').style.display = 'none';
+            Toastify({
+                text: 'Session expired. Please login again.',
+                duration: 3000,
+                style: { background: '#ef4444' }
+            }).showToast();
+        } else {
+            console.error('Unexpected response from verify-token:', response.status);
+            // Don't logout, just keep current state
         }
+    } catch (error) {
+        console.error('Error verifying token:', error);
+        Toastify({
+            text: 'Error verifying token. Please try again.',
+            duration: 3000,
+            style: { background: '#ef4444' }
+        }).showToast();
+        // Don't logout on network errors, keep current state
+    }
+}
 
 async function loadProfile() {
-    let nickname = window.location.pathname.split('/').pop() || 'me';
-    if (nickname === 'me' && !userToken) {
+    if (!userToken) {
         Toastify({
             text: 'Please login to view your profile',
             duration: 3000,
             style: { background: '#ef4444' }
         }).showToast();
         window.location.href = '/login.html?reason=Please login to view your profile';
-        return;
+        return null;
     }
 
     try {
-        const response = await fetch(`${API_URL}/api/profile/${encodeURIComponent(nickname)}`, {
-            headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
+        const verifyResponse = await fetchWithRefresh(`${API_URL}/api/verify-token`, {
+            headers: { 'Authorization': `Bearer ${userToken}` }
+        });
+        if (!verifyResponse.ok) {
+            throw new Error('Invalid token');
+        }
+
+        const response = await fetchWithRefresh(`${API_URL}/api/profile/me`, {
+            headers: { 'Authorization': `Bearer ${userToken}` }
         });
         if (!response.ok) {
-            const errorData = await response.json();
-            if (response.status === 403 && errorData.loginRequired) {
-                document.getElementById('profile-nickname').innerHTML = `
-                    <p class="error">This profile is private. Please <a href="/login.html?reason=private_profile" class="text-blue-500 hover:underline">login</a> to view.</p>
-                `;
-                document.querySelectorAll('.container:not(#home)').forEach(container => container.style.display = 'none');
-                return;
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch {
+                throw new Error('Invalid server response');
             }
-            throw new Error(errorData.error || 'Failed to fetch profile');
+            throw new Error(data.error || 'Failed to fetch profile');
         }
 
         const data = await response.json();
-        document.title = `${data.profile.nickname || data.username}'s Profile`;
-        document.getElementById('portfolio-name').textContent = data.profile.portfolioName?.trim() || data.profile.nickname || 'Portfolio';
-        document.getElementById('profile-nickname').textContent = data.profile.nickname || data.username;
-        document.getElementById('profile-jobTitle').textContent = data.profile.jobTitle || 'Not specified';
-        document.getElementById('profile-bio').textContent = data.profile.bio || 'Not specified';
-        const avatarContainer = document.getElementById('avatar-container');
-        const avatarUrl = data.profile.avatar || '/assets/img/default-avatar.png';
-        const avatarDisplayType = data.profile.avatarDisplayType || 'normal';
-        const svgColor = data.profile.svgColor || '#000000';
-        avatarContainer.innerHTML = avatarDisplayType === 'svg' ? `
-            <svg class="home__blob" viewBox="0 0 479 467" xmlns="http://www.w3.org/2000/svg">
-                <mask id="mask0" mask-type="alpha">
-                    <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z"/>
-                </mask>
-                <g mask="url(#mask0)">
-                    <path d="M9.19024 145.964C34.0253 76.5814 114.865 54.7299 184.111 29.4823C245.804 6.98884 311.86 -14.9503 370.735 14.143C431.207 44.026 467.948 107.508 477.191 174.311C485.897 237.229 454.931 294.377 416.506 344.954C373.74 401.245 326.068 462.801 255.442 466.189C179.416 469.835 111.552 422.137 65.1576 361.805C17.4835 299.81 -17.1617 219.583 9.19024 145.964Z" fill="${svgColor}"/>
-                    <image class="home__blob-img" x="50" y="60" href="${avatarUrl}" alt="Profile Image"/>
-                </g>
-            </svg>
-        ` : `
-            <img src="${avatarUrl}" alt="Profile Image" class="w-24 h-24 object-cover rounded-full mx-auto">
-        `;
-        document.getElementById('contact-phone').href = `tel:${data.profile.phone || ''}`;
-        document.getElementById('download-cv').href = `${API_URL}/api/profile/pdf/${encodeURIComponent(nickname)}`;
-        document.getElementById('create-canva').href = `${API_URL}/api/profile/canva/${encodeURIComponent(nickname)}`;
-        const socialLinksContainer = document.getElementById('social-links');
-        const socialLinks = data.profile.socialLinks || {};
-        const socialIcons = {
-            linkedin: 'bxl-linkedin',
-            behance: 'bxl-behance',
-            github: 'bxl-github',
-            whatsapp: 'bxl-whatsapp'
-        };
-        socialLinksContainer.innerHTML = Object.entries(socialLinks)
-            .filter(([_, url]) => url?.trim())
-            .map(([key, url]) => `
-                <a href="${url}" class="home__social-icon" target="_blank">
-                    <i class='bx ${socialIcons[key]}'></i>
-                </a>
-            `).join('');
-        document.getElementById('footer-username').textContent = data.profile.nickname || data.username;
+        document.getElementById('portfolioName').value = data.profile.portfolioName || 'Portfolio';
+        document.getElementById('portfolio-name').textContent = data.profile.portfolioName || 'Portfolio';
+        document.getElementById('nickname').value = data.profile.nickname || '';
+        document.getElementById('jobTitle').value = data.profile.jobTitle || '';
+        document.getElementById('bio').value = data.profile.bio || '';
+        document.getElementById('phone').value = data.profile.phone || '';
+        document.getElementById('isPublic').value = data.profile.isPublic.toString();
+        document.getElementById('social-linkedin').value = data.profile.socialLinks?.linkedin || '';
+        document.getElementById('social-behance').value = data.profile.socialLinks?.behance || '';
+        document.getElementById('social-github').value = data.profile.socialLinks?.github || '';
+        document.getElementById('social-whatsapp').value = data.profile.socialLinks?.whatsapp || '';
+        document.getElementById('avatarDisplayType').value = data.profile.avatarDisplayType || 'normal';
+        document.getElementById('svgColor').value = data.profile.svgColor || '#000000';
+        document.getElementById('pdfFormat').value = data.profile.pdfFormat || 'jspdf';
+        toggleSvgColorField();
 
-        // تحديث الأقسام
-        const educationContainer = document.getElementById('profile-education');
-        educationContainer.innerHTML = data.profile.education.length ? data.profile.education.map(edu => `
-            <p class="about__text">${edu.degree} at ${edu.institution} (${edu.year})</p>
-        `).join('') : '<p class="about__text">No education details provided.</p>';
-
-        const experienceContainer = document.getElementById('profile-experience');
-        experienceContainer.innerHTML = data.profile.experience.length ? data.profile.experience.map(exp => `
-            <p class="about__text">${exp.role} at ${exp.company} (${exp.duration})</p>
-        `).join('') : '<p class="about__text">No experience details provided.</p>';
-
-        const certificatesContainer = document.getElementById('profile-certificates');
-        certificatesContainer.innerHTML = data.profile.certificates.length ? data.profile.certificates.map(cert => `
-            <p class="about__text">${cert.name} by ${cert.issuer} (${cert.year})</p>
-        `).join('') : '<p class="about__text">No certificates provided.</p>';
-
-        const interestsContainer = document.getElementById('profile-interests');
-        interestsContainer.innerHTML = data.profile.interests.length ? data.profile.interests.map(interest => `
-            <p class="about__text">${interest}</p>
-        `).join('') : '<p class="about__text">No interests provided.</p>';
-
-        const skillsContainer = document.getElementById('profile-skills');
-        skillsContainer.innerHTML = data.profile.skills.length ? data.profile.skills.map(skill => `
-            <div class="skills__data">
-                <div class="skills__names">
-                    <span class="skills__name">${skill.name}</span>
-                </div>
-                <div class="skills__bar" style="width: ${skill.percentage}%"></div>
-                <div><span class="skills__percentage">${skill.percentage}%</span></div>
-            </div>
-        `).join('') : '<p>No skills provided.</p>';
-
-        const projectsContainer = document.getElementById('profile-projects');
-        projectsContainer.innerHTML = data.profile.projects.length ? data.profile.projects.map(project => `
-            <div class="single-portfolio-content">
-                <img src="${project.image || '/assets/img/default-project.png'}" alt="${project.title}" class="work__img">
-                <div class="work__content">
-                    <h3>${project.title}</h3>
-                    <p>${project.description}</p>
-                    <div class="select-container">
-                        <select name="links" onchange="if(this.value) window.open(this.value, '_blank');">
-                            <option value="">Choose an option</option>
-                            ${project.links.map(link => `<option value="${link.value}">${link.option}</option>`).join('')}
-                        </select>
-                    </div>
-                </div>
-            </div>
-        `).join('') : '<p>No projects provided.</p>';
-
-        if (!userToken) {
-            document.getElementById('profile-nickname').innerHTML += `
-                <p class="text-gray-700 dark:text-gray-300 mt-4">
-                    <a href="/login.html" class="text-blue-500 hover:underline">Login</a> to access more features.
-                </p>
-            `;
+        // Display saved avatar with error handling
+        if (data.profile.avatar) {
+            const avatarPreview = document.createElement('img');
+            avatarPreview.src = data.profile.avatar;
+            avatarPreview.className = 'w-24 h-24 rounded-full mt-2';
+            avatarPreview.onerror = () => {
+                avatarPreview.src = '/assets/img/default-avatar.png';
+                Toastify({
+                    text: 'Failed to load avatar image. Using default image.',
+                    duration: 3000,
+                    style: { background: '#ef4444' }
+                }).showToast();
+            };
+            const avatarInput = document.getElementById('avatar');
+            const existingPreview = avatarInput?.parentElement.querySelector('img');
+            if (existingPreview) existingPreview.remove();
+            avatarInput?.after(avatarPreview);
         }
+
+        if (data.hasTransparency) {
+            document.getElementById('avatar-suggestion').classList.remove('hidden');
+            document.getElementById('avatar-suggestion').textContent = 'The current image has a transparent background. It is recommended to use "Inside SVG" for custom shapes and colors.';
+        } else if (data.profile.avatar) {
+            document.getElementById('avatar-suggestion').classList.remove('hidden');
+            document.getElementById('avatar-suggestion').textContent = 'The current image has a background. It is recommended to use "Normal Image" for best display.';
+        }
+
+        const educationContainer = document.getElementById('education-fields');
+        educationContainer.innerHTML = '';
+        data.profile.education?.forEach(edu => {
+            addDynamicField('education-fields', `
+                <input type="text" name="institution" placeholder="Institution" value="${edu.institution || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="text" name="degree" placeholder="Degree" value="${edu.degree || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="text" name="year" placeholder="Year" value="${edu.year || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="button" class="remove-field add-btn">Remove</button>
+            `);
+        });
+
+        const experienceContainer = document.getElementById('experience-fields');
+        experienceContainer.innerHTML = '';
+        data.profile.experience?.forEach(exp => {
+            addDynamicField('experience-fields', `
+                <input type="text" name="company" placeholder="Company" value="${exp.company || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="text" name="role" placeholder="Role" value="${exp.role || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="text" name="duration" placeholder="Duration" value="${exp.duration || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="button" class="remove-field add-btn">Remove</button>
+            `);
+        });
+
+        const certificateContainer = document.getElementById('certificate-fields');
+        certificateContainer.innerHTML = '';
+        data.profile.certificates?.forEach(cert => {
+            addDynamicField('certificate-fields', `
+                <input type="text" name="name" placeholder="Certificate Name" value="${cert.name || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="text" name="issuer" placeholder="Issuer" value="${cert.issuer || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="text" name="year" placeholder="Year" value="${cert.year || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="button" class="remove-field add-btn">Remove</button>
+            `);
+        });
+
+        const skillContainer = document.getElementById('skill-fields');
+        skillContainer.innerHTML = '';
+        data.profile.skills?.forEach(skill => {
+            addDynamicField('skill-fields', `
+                <input type="text" name="name" placeholder="Skill Name" value="${skill.name || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="number" name="percentage" placeholder="Percentage (0-100)" value="${skill.percentage || 0}" min="0" max="100" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="button" class="remove-field add-btn">Remove</button>
+            `);
+        });
+
+        const projectContainer = document.getElementById('project-fields');
+        projectContainer.innerHTML = '';
+        data.profile.projects?.forEach(project => {
+            const field = document.createElement('div');
+            field.className = 'dynamic-field';
+            field.innerHTML = `
+                <input type="text" name="title" placeholder="Project Title" value="${project.title || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <textarea name="description" placeholder="Project Description" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" rows="3">${project.description || ''}</textarea>
+                <input type="file" name="image" accept="image/jpeg,image/png" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="button" class="remove-image add-btn">Remove Image</button>
+                <input type="text" name="rating" placeholder="Rating (e.g., Good)" value="${project.rating || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <input type="number" name="stars" placeholder="Stars (0-5)" value="${project.stars || 0}" min="0" max="5" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <div class="link-fields">
+                    ${project.links?.map(link => `
+                        <div class="link-field">
+                            <input type="text" name="option" placeholder="Link Name (e.g., Demo)" value="${link.option || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <input type="url" name="value" placeholder="Link URL (e.g., https://example.com)" value="${link.value || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <button type="button" class="remove-link add-btn">Remove Link</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button type="button" class="add-link add-btn">Add Link</button>
+                <button type="button" class="remove-field add-btn">Remove Project</button>
+            `;
+            projectContainer.appendChild(field);
+            if (project.image) {
+                const imgPreview = document.createElement('img');
+                imgPreview.src = project.image;
+                imgPreview.className = 'w-24 h-24 rounded mt-2';
+                imgPreview.onerror = () => {
+                    imgPreview.src = '/assets/img/default-project.png';
+                    Toastify({
+                        text: 'Failed to load project image. Using default image.',
+                        duration: 3000,
+                        style: { background: '#ef4444' }
+                    }).showToast();
+                };
+                field.querySelector('[name="image"]').after(imgPreview);
+            }
+            field.querySelector('.remove-field').addEventListener('click', () => field.remove());
+            field.querySelector('.add-link').addEventListener('click', () => {
+                const linkContainer = field.querySelector('.link-fields');
+                const newLink = document.createElement('div');
+                newLink.className = 'link-field';
+                newLink.innerHTML = `
+                    <input type="text" name="option" placeholder="Link Name (e.g., Demo)" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <input type="url" name="value" placeholder="Link URL (e.g., https://example.com)" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <button type="button" class="remove-link add-btn">Remove Link</button>
+                `;
+                linkContainer.appendChild(newLink);
+                newLink.querySelector('.remove-link').addEventListener('click', () => newLink.remove());
+            });
+            field.querySelector('.remove-image')?.addEventListener('click', () => {
+                const imageInput = field.querySelector('[name="image"]');
+                imageInput.value = '';
+                const imgPreview = field.querySelector('img');
+                if (imgPreview) imgPreview.remove();
+            });
+        });
+
+        const interestContainer = document.getElementById('interest-fields');
+        interestContainer.innerHTML = '';
+        data.profile.interests?.forEach(interest => {
+            addDynamicField('interest-fields', `
+                <input type="text" name="interest" placeholder="Interest" value="${interest || ''}" class="mb-2 w-full p-2.5 text-sm border rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <button type="button" class="remove-field add-btn">Remove</button>
+            `);
+        });
+
+        return data; // Return data for nickname validation
     } catch (error) {
         console.error('Error loading profile:', error);
         Toastify({
-            text: `Error loading profile: ${error.message}`,
+            text: `Error loading profile: ${error.message}. Please try refreshing the page.`,
             duration: 3000,
             style: { background: '#ef4444' }
         }).showToast();
-        document.getElementById('profile-nickname').innerHTML = `
-            <p class="error">Failed to load profile. Please try again later.</p>
-        `;
-        document.querySelectorAll('.container:not(#home)').forEach(container => container.style.display = 'none');
+        return null;
     }
 }
-       
+
 async function loadInteractions() {
             const interactionsContainer = document.getElementById('profile-interactions');
             if (!userToken) {
@@ -749,14 +828,15 @@ async function loadInteractions() {
             }
         }
 
+
 async function loadSearchResults(query) {
     try {
-        const response = await fetch(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
+        const response = await fetchWithRefresh(`${API_URL}/api/users/search?query=${encodeURIComponent(query)}`, {
             headers: userToken ? { 'Authorization': `Bearer ${userToken}` } : {}
         });
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'فشل جلب نتائج البحث');
+            throw new Error(errorData.error || 'Failed to fetch search results');
         }
         const users = await response.json();
         const searchResults = document.getElementById('search-results');
@@ -766,11 +846,11 @@ async function loadSearchResults(query) {
                 <img src="${user.profile.avatar || '/assets/img/default-avatar.png'}" alt="${user.profile.nickname || user.username}" class="inline-block w-8 h-8 rounded-full">
                 <span class="text-gray-900 dark:text-white">${user.profile.nickname || user.username}</span>
             </a>
-        `).join('') : '<p class="p-2 text-gray-600 dark:text-gray-400">لم يتم العثور على مستخدمين.</p>';
+        `).join('') : '<p class="p-2 text-gray-600 dark:text-gray-400">No users found.</p>';
     } catch (error) {
-        console.error('خطأ في البحث عن المستخدمين:', error);
+        console.error('Error searching users:', error);
         Toastify({
-            text: `خطأ في البحث: ${error.message}`,
+            text: `Error searching: ${error.message}`,
             duration: 3000,
             style: { background: '#ef4444' }
         }).showToast();
@@ -924,21 +1004,31 @@ async function loadSocialMedia() {
             });
         });
 
-                async function fetchCsrfToken() {
+async function fetchCsrfToken() {
     try {
-        const response = await fetch(`${API_URL}/api/csrf-token`);
+        const response = await fetch(`${API_URL}/api/csrf-token`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch CSRF token');
+        }
         const data = await response.json();
-        document.getElementById('csrf-token').value = data.csrfToken;
+        const csrfInput = document.getElementById('csrf-token');
+        if (csrfInput) {
+            csrfInput.value = data.csrfToken;
+        } else {
+            console.error('CSRF token input element not found');
+        }
     } catch (error) {
         console.error('Error fetching CSRF token:', error);
         Toastify({
-            text: 'Error fetching CSRF token',
+            text: 'Error fetching CSRF token. Some features may not work.',
             duration: 3000,
             style: { background: '#ef4444' }
         }).showToast();
     }
 }
-
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -986,18 +1076,69 @@ async function refreshToken() {
     }
 }
 
-async function fetchWithRefresh(url, options = {}) {
-    let response = await fetch(url, options);
-    if (response.status === 401) {
-        const newToken = await refreshToken();
-        if (newToken) {
-            options.headers = { ...options.headers, 'Authorization': `Bearer ${newToken}` };
-            response = await fetch(url, options);
+  
+   
+    async function fetchWithRefresh(url, options = {}, retries = 1) {
+    try {
+        // Ensure CSRF token is fetched if needed
+        let csrfToken = document.getElementById('csrf-token')?.value;
+        if (!csrfToken) {
+            await fetchCsrfToken();
+            csrfToken = document.getElementById('csrf-token')?.value;
         }
+        
+        options.headers = {
+            ...options.headers,
+            'X-CSRF-Token': csrfToken || '',
+        };
+
+        let response = await fetch(url, { ...options, timeout: 10000 });
+        if (response.status === 401 && retries > 0) {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) {
+                throw new Error('No refresh token available');
+            }
+
+            const refreshResponse = await fetch(`${API_URL}/api/refresh-token`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken || '',
+                },
+                body: JSON.stringify({ refreshToken }),
+            });
+
+            if (!refreshResponse.ok) {
+                const errorData = await refreshResponse.json();
+                throw new Error(errorData.error || 'Failed to refresh token');
+            }
+
+            const { accessToken, refreshToken: newRefreshToken } = await refreshResponse.json();
+            localStorage.setItem('userToken', accessToken);
+            localStorage.setItem('refreshToken', newRefreshToken);
+            userToken = accessToken;
+
+            options.headers = { ...options.headers, 'Authorization': `Bearer ${accessToken}` };
+            return await fetchWithRefresh(url, options, retries - 1);
+        }
+        return response;
+    } catch (error) {
+        console.error('Error in fetchWithRefresh:', error);
+        if (error.message.includes('No refresh token') || error.message.includes('Failed to refresh token')) {
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('refreshToken');
+            userToken = null;
+            Toastify({
+                text: 'Session expired. Please login again.',
+                duration: 3000,
+                style: { background: '#ef4444' }
+            }).showToast();
+            window.location.href = '/login.html?reason=session_expired';
+        }
+        throw error;
     }
-    return response;
 }
-    </script>
+   </script>
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NZQ6642M"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
